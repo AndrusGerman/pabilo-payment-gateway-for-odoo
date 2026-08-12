@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_pabilo" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pabilo</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Pabilo" string="Pabilo Payment" data-key="pabilo_payment_gateway">
+                    <h2>Pabilo API Configuration</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="pabilo_api_key" string="API Key (appKey)"/>
+                                <div class="text-muted">
+                                    Configura la llave para usar la API de Pabilo.
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="pabilo_api_key" class="o_light_label" widget="password"/>
+                                    </div>
+                                    <div class="mt16">
+                                        <label for="pabilo_api_url" string="URL Base"/>
+                                        <div class="text-muted">
+                                            Backend de Pabilo. Local con Odoo en Docker: http://host.docker.internal:3349
+                                        </div>
+                                        <field name="pabilo_api_url" class="o_light_label"/>
+                                    </div>
+                                    <div class="mt16">
+                                        <button name="action_pabilo_sync_banks" type="object" string="Sincronizar Cuentas Pabilo" class="btn-secondary" icon="fa-refresh"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="action_pabilo_config_settings" model="ir.actions.act_window">
+        <field name="name">Ajustes Pabilo</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'pabilo_payment_gateway', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_pabilo_root" name="Pabilo" sequence="100"/>
+    
+    <menuitem id="menu_pabilo_config" 
+              name="Configuración" 
+              parent="menu_pabilo_root" 
+              sequence="10"/>
+              
+    <menuitem id="menu_pabilo_config_settings" 
+              name="Ajustes Pabilo" 
+              parent="menu_pabilo_config" 
+              sequence="10" 
+              action="action_pabilo_config_settings"/>
+</odoo>

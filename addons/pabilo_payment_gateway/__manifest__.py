@@ -1,0 +1,30 @@
+{
+    'name': 'Pabilo Payment Gateway for Odoo',
+    'version': '16.0.2.0.0',
+    'summary': 'Verificación de Pagos Móviles, Binance y Transferencias con Pabilo',
+    'description': 'Módulo para integrar la verificación de pagos (betaserio), enlaces de pago y webhooks a través de Pabilo. Soporta POS, Contabilidad y múltiples monedas (VEF, USD, USDT).',
+    'category': 'Accounting/Payment Providers',
+    'author': 'AndrusCodex',
+    'website': 'https://pabilo.app',
+    'license': 'LGPL-3',
+    'depends': ['base', 'account', 'payment', 'point_of_sale'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/ir_config_parameter.xml',
+        'data/payment_provider_data.xml',
+        'views/res_config_settings_views.xml',
+        'views/payment_provider_views.xml',
+        'views/payment_transaction_views.xml',
+        'views/pos_payment_method_views.xml',
+        'views/pabilo_user_bank_views.xml',
+    ],
+    'assets': {
+        'point_of_sale.assets': [
+            'pabilo_payment_gateway/static/src/js/payment_pabilo.js',
+            'pabilo_payment_gateway/static/src/js/models.js',
+        ],
+    },
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

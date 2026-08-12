@@ -1,0 +1,34 @@
+services:
+  web:
+    image: odoo:16.0
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    # Podman/WSL2: host.docker.internal por defecto apunta al gateway de la VM
+    # (10.89.0.1), que no es el host Windows. Se ancla a la IP LAN del host,
+    # donde el backend de Pabilo escucha con HTTP_HOST=0.0.0.0.
+    extra_hosts:
+      - "host.docker.internal:192.168.31.49"
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:

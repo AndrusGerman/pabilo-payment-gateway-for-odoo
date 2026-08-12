@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_payment_transaction_form_inherit_pabilo" model="ir.ui.view">
+        <field name="name">payment.transaction.form.inherit.pabilo</field>
+        <field name="model">payment.transaction</field>
+        <field name="inherit_id" ref="payment.payment_transaction_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Verificación Pabilo" name="pabilo_verify">
+                        <group>
+                            <group string="Datos del Pago">
+                                <field name="pabilo_user_bank_id"/>
+                                <field name="pabilo_reference"/>
+                                <field name="pabilo_movement_type"/>
+                            </group>
+                            <group string="Resultado">
+                                <field name="pabilo_status"/>
+                                <field name="pabilo_payment_id"/>
+                                <field name="pabilo_is_new"/>
+                                <field name="pabilo_credit_cost"/>
+                            </group>
+                        </group>
+                        <div class="oe_button_box">
+                            <button name="action_verify_pabilo_payment"
+                                    type="object"
+                                    string="Verificar Pago (betaserio)"
+                                    class="btn-primary"
+                                    attrs="{'invisible': [('pabilo_status', '=', 'verified')]}"
+                                    icon="fa-check-circle"/>
+                        </div>
+                    </page>
+                    <page string="Enlace de Pago Pabilo" name="pabilo_link">
+                        <group>
+                            <group string="Enlace">
+                                <field name="pabilo_payment_link_id"/>
+                                <field name="pabilo_payment_link_url" widget="url"/>
+                                <field name="pabilo_payment_link_status"/>
+                            </group>
+                        </group>
+                        <div class="oe_button_box">
+                            <button name="action_create_pabilo_payment_link"
+                                    type="object"
+                                    string="Crear Enlace de Pago"
+                                    class="btn-primary"
+                                    attrs="{'invisible': [('pabilo_payment_link_id', '!=', False)]}"
+                                    icon="fa-link"/>
+                            <button name="action_check_pabilo_payment_link"
+                                    type="object"
+                                    string="Consultar Estado"
+                                    class="btn-secondary"
+                                    attrs="{'invisible': [('pabilo_payment_link_id', '=', False)]}"
+                                    icon="fa-refresh"/>
+                        </div>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

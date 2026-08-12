@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_provider_form_pabilo" model="ir.ui.view">
+        <field name="name">payment.provider.form.pabilo</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group attrs="{'invisible': [('code', '!=', 'pabilo')]}">
+                    <field name="pabilo_api_key" password="True" 
+                           string="API Key (appKey)"
+                           placeholder="Tu API Key de Pabilo"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>
