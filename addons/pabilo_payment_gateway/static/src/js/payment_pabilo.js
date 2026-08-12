@@ -34,21 +34,44 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return promise;
         },
 
-        _verify: function (reference, amount) {
+        _verify: function (reference, amount, bankId) {
             return rpc.query(
                 {
                     model: 'pos.payment.method',
                     method: 'pabilo_verify_payment',
-                    args: [[this.payment_method.id], reference, amount],
+                    args: [[this.payment_method.id], reference, amount, bankId || null],
                 },
                 { shadow: true, timeout: 25000 }
             );
         },
 
+        _fetch_accounts: async function () {
+            // Cuentas disponibles para que el cajero elija a cuál llegó el pago.
+            // Se cachea solo en éxito; si falla la red se sigue con la cuenta por defecto.
+            if (this._pabilo_accounts) {
+                return this._pabilo_accounts;
+            }
+            try {
+                const accounts = await rpc.query(
+                    {
+                        model: 'pos.payment.method',
+                        method: 'pabilo_get_user_banks',
+                        args: [[this.payment_method.id]],
+                    },
+                    { shadow: true, timeout: 10000 }
+                );
+                this._pabilo_accounts = accounts || [];
+            } catch (error) {
+                return [];
+            }
+            return this._pabilo_accounts;
+        },
+
         /**
          * Se llama cuando el cajero pulsa "Enviar" en una línea de pago Pabilo.
-         * Pide los últimos 6 dígitos de la referencia (el backend matchea por
-         * sufijo) y verifica con reintentos automáticos.
+         * 1) Si hay varias cuentas, el cajero elige a cuál llegó el pago.
+         * 2) Pide los últimos 6 dígitos de la referencia (el backend matchea por sufijo).
+         * 3) Verifica con reintentos automáticos contra la cuenta elegida.
          */
         send_payment_request: async function (cid) {
             this._super(...arguments);
@@ -56,8 +79,38 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             const amount = line.amount;
             this._pabilo_cancelled = false;
 
-            const accountHint = this.payment_method.pabilo_account_hint
-                ? _.str.sprintf(_t('Cuenta destino: %s. '), this.payment_method.pabilo_account_hint)
+            let bankId = this.payment_method.pabilo_user_bank_id
+                ? this.payment_method.pabilo_user_bank_id[0]
+                : null;
+            let bankLabel = this.payment_method.pabilo_account_hint || '';
+
+            const accounts = await this._fetch_accounts();
+            if (this._pabilo_cancelled) {
+                return false;
+            }
+            if (accounts.length > 1) {
+                const { confirmed, payload: account } = await Gui.showPopup('SelectionPopup', {
+                    title: _t('Cuenta bancaria destino'),
+                    body: _t('¿A cuál de estas cuentas envió el cliente el pago?'),
+                    list: accounts.map((acc) => ({
+                        id: acc.id,
+                        label: acc.display_name,
+                        isSelected: acc.id === bankId,
+                        item: acc,
+                    })),
+                });
+                if (this._pabilo_cancelled || !confirmed || !account) {
+                    return false;
+                }
+                bankId = account.id;
+                bankLabel = account.display_name;
+            } else if (accounts.length === 1) {
+                bankId = accounts[0].id;
+                bankLabel = accounts[0].display_name;
+            }
+
+            const accountHint = bankLabel
+                ? _.str.sprintf(_t('Cuenta destino: %s. '), bankLabel)
                 : '';
 
             const { confirmed, payload: reference } = await Gui.showPopup('NumberPopup', {
@@ -82,7 +135,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 }
 
                 try {
-                    lastResult = await this._verify(reference, amount);
+                    lastResult = await this._verify(reference, amount, bankId);
                 } catch (error) {
                     await Gui.showPopup('ErrorPopup', {
                         title: _t('Error de Conexión'),
@@ -106,7 +159,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                     line.pabilo_is_new = lastResult.is_new;
                     line.set_payment_status('done');
                     line.set_receipt_info(
-                        _.str.sprintf(_t('Pabilo ref: %s\n'), reference)
+                        _.str.sprintf(_t('Pabilo ref: %s\nCuenta: %s\n'), reference, bankLabel || '-')
                     );
                     return true;
                 }

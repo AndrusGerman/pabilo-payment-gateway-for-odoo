@@ -3,3 +3,4 @@ access_payment_transaction_pabilo,payment.transaction.pabilo,payment.model_payme
 access_payment_transaction_pabilo_account,payment.transaction.pabilo.account,payment.model_payment_transaction,account.group_account_invoice,1,1,1,0
 access_pabilo_user_bank,pabilo.user.bank,model_pabilo_user_bank,base.group_user,1,0,0,0
 access_pabilo_user_bank_admin,pabilo.user.bank.admin,model_pabilo_user_bank,base.group_system,1,1,1,1
+access_pabilo_payment_method_wizard,pabilo.payment.method.wizard,model_pabilo_payment_method_wizard,point_of_sale.group_pos_manager,1,1,1,1

@@ -16,6 +16,7 @@
         'views/payment_provider_views.xml',
         'views/payment_transaction_views.xml',
         'views/pos_payment_method_views.xml',
+        'views/pabilo_payment_method_wizard_views.xml',
         'views/pabilo_user_bank_views.xml',
     ],
     'assets': {
