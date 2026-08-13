@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class PabiloPaymentMethodWizard(models.TransientModel):
@@ -27,6 +27,13 @@ class PabiloPaymentMethodWizard(models.TransientModel):
         default=lambda self: self.env.company,
         readonly=True,
     )
+
+    @api.model
+    def default_get(self, fields_list):
+        # Al abrir el asistente se refrescan las cuentas si estan viejas, para
+        # que el desplegable muestre lo que hay hoy en Pabilo sin pasos previos.
+        self.env['pabilo.user.bank']._sync_if_stale()
+        return super().default_get(fields_list)
 
     def action_confirm(self):
         """Crea el método de pago POS ya configurado para Pabilo y lo abre."""

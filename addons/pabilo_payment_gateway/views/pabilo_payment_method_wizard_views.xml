@@ -38,12 +38,28 @@
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
                 <header>
+                    <!-- display="always": sin esto Odoo 17 solo muestra los
+                         botones de header al seleccionar filas (display por
+                         defecto "selection", ver web/views/utils.js), y este
+                         boton crea un registro nuevo: no hay nada que
+                         seleccionar. En Odoo 16 el atributo no existe, asi que
+                         alli el acceso es por el menu de Pabilo. -->
                     <button name="%(action_pabilo_payment_method_wizard)d"
                             type="action"
+                            display="always"
                             string="Agregar Método Pabilo"
                             class="btn-primary"/>
                 </header>
             </xpath>
         </field>
     </record>
+
+    <!-- El asistente tambien vive en el menu de Pabilo: es el unico acceso que
+         funciona igual en 16 y 17, y no depende de estar en la lista correcta. -->
+    <menuitem id="menu_pabilo_payment_method"
+              name="Agregar Método de Pago"
+              parent="menu_pabilo_root"
+              sequence="7"
+              groups="point_of_sale.group_pos_manager"
+              action="action_pabilo_payment_method_wizard"/>
 </odoo>
