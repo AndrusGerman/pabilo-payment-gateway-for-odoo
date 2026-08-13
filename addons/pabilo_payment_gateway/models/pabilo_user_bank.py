@@ -127,6 +127,29 @@ class PabiloUserBank(models.Model):
             return False
 
     @api.model
+    def _fetch_webhook_secret(self):
+        """Trae de Pabilo el secreto de firma de webhooks de este usuario.
+
+        No sobrescribe uno ya guardado: si el admin lo puso a mano, manda el
+        suyo. Nunca lanza excepción — es un extra de la sincronización, no puede
+        tumbarla.
+        """
+        params = self.env['ir.config_parameter'].sudo()
+        if params.get_param('pabilo.webhook_secret'):
+            return False
+        try:
+            ok, secret, message = self.env['pabilo.client'].fetch_webhook_secret()
+        except Exception:
+            _logger.exception("Pabilo: error obteniendo el secreto del webhook")
+            return False
+        if not ok:
+            _logger.warning("Pabilo: no se pudo obtener el secreto del webhook: %s", message)
+            return False
+        params.set_param('pabilo.webhook_secret', secret)
+        _logger.info("Pabilo: secreto del webhook obtenido y guardado")
+        return True
+
+    @api.model
     def _cron_sync_banks(self):
         """Red de seguridad diaria: refresca todas las compañías con appKey."""
         companies = self.env['res.company'].sudo().search([('pabilo_api_key', '!=', False)])
@@ -149,6 +172,11 @@ class PabiloUserBank(models.Model):
         if not ok:
             _logger.warning("Pabilo sync error para %s: %s", company.name, message)
             return False, message
+
+        # De paso se trae el secreto con el que Pabilo firma los webhooks de
+        # este usuario. El backend lo genera la primera vez que se pide, así que
+        # nadie tiene que copiarlo a mano ni compartirlo entre comercios.
+        self._fetch_webhook_secret()
 
         # Espejo escribible: sudo() salta la ACL de solo lectura y el flag de
         # contexto pasa las guardas de create/write/unlink.

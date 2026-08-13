@@ -5,6 +5,10 @@ services:
       - db
     ports:
       - "8069:8069"
+    # El volumen de postgres se comparte con la rama 17.0. Abrir una base de v17
+    # desde v16 (o al reves) la deja inservible, asi que cada serie solo ve las
+    # suyas: aqui `pabilo` y `pabilo16*`, nunca `pabilo17`.
+    command: ["odoo", "--db-filter=^pabilo($|16)"]
     # Podman/WSL2: host.docker.internal por defecto apunta al gateway de la VM
     # (10.89.0.1), que no es el host Windows. Se ancla a la IP LAN del host,
     # donde el backend de Pabilo escucha con HTTP_HOST=0.0.0.0.
