@@ -344,7 +344,8 @@ ha abierto una sesión de POS en 17.0. Es lo que falta antes de publicar esa ram
 - Capturas de pantalla del POS para la ficha de tienda.
 - Los `msgid` del `.pot` están en español porque el código fuente lo está. Para
   una ficha internacional habría que pasar el fuente a inglés y dejar un `es.po`.
-- **Rotar el appKey**: estuvo commiteado en claro y sigue en el historial de git.
-  Ver `CREDENCIALES.local.md`.
+- ~~Rotar el appKey~~: ya no hace falta. Estuvo commiteado en claro, pero se
+  purgó de todo el historial con `git filter-repo` y el repo no tenía remoto, así
+  que nunca salió de la máquina. Detalles en `CREDENCIALES.local.md`.
 - El webhook `/pabilo/webhook` no es apto para producción en ninguna de las dos
   ramas (ver "Limitaciones conocidas" en el README del addon).
