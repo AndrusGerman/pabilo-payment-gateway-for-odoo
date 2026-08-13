@@ -144,6 +144,28 @@ class PabiloClient(models.AbstractModel):
         return result
 
     @api.model
+    def fetch_webhook_secret(self, provider=None):
+        """GET /me/webhook-secret. Devuelve (ok, secreto, mensaje_error).
+
+        El secreto es de este usuario de Pabilo, no global: con uno compartido
+        entre todos los clientes, cualquiera podría firmar webhooks a nombre de
+        otro comercio. El backend lo genera la primera vez que se pide, así que
+        no hay que copiar nada a mano.
+        """
+        http_status, body = self._request('GET', '/me/webhook-secret', provider=provider)
+        if http_status == 200:
+            secret = body.get('webhook_secret') or ''
+            if not secret:
+                return False, '', _('Pabilo devolvió un secreto de webhook vacío.')
+            return True, secret, ''
+        message = str(
+            PABILO_ERROR_MESSAGES.get(body.get('error', ''))
+            or body.get('message')
+            or _('Error obteniendo el secreto del webhook.')
+        )
+        return False, '', message
+
+    @api.model
     def get_user_banks(self, provider=None):
         """GET /me/usersbank. Devuelve (ok, lista_de_bancos, mensaje_error)."""
         http_status, body = self._request('GET', '/me/usersbank', provider=provider)

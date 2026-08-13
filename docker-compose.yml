@@ -9,7 +9,10 @@ services:
     # `pabilo` con módulos en versión 16. Si Odoo 17 la abriera intentaría
     # cargarla y la dejaría inservible, así que solo se le permite ver bases
     # cuyo nombre empiece por `pabilo17`.
-    command: ["odoo", "--db-filter=^pabilo17"]
+    #
+    # OJO: el filtro debe resolver a UNA sola base. Si coincide con varias,
+    # Odoo no sabe cuál usar en una ruta pública y /pabilo/webhook responde 404.
+    command: ["odoo", "--db-filter=^pabilo17$$"]
     # Podman/WSL2: host.docker.internal por defecto apunta al gateway de la VM
     # (10.89.0.1), que no es el host Windows. Se ancla a la IP LAN del host,
     # donde el backend de Pabilo escucha con HTTP_HOST=0.0.0.0.

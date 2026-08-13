@@ -20,10 +20,10 @@ class ResConfigSettings(models.TransientModel):
     pabilo_webhook_secret = fields.Char(
         string='Secreto del Webhook',
         config_parameter='pabilo.webhook_secret',
-        help="Debe coincidir con WEBHOOK_SIGN_SECRET del backend de Pabilo. "
-             "Con él se verifica la firma HMAC de cada webhook; sin secreto "
-             "configurado, los webhooks se rechazan (cualquiera que conozca la "
-             "URL podría dar un pago por cobrado)."
+        help="Se obtiene solo de Pabilo al sincronizar; es propio de tu cuenta, "
+             "no compartido con otros comercios. Con él se verifica la firma "
+             "HMAC de cada webhook; sin secreto, los webhooks se rechazan "
+             "(cualquiera que conozca la URL podría dar un pago por cobrado)."
     )
 
     def action_pabilo_sync_banks(self):
