@@ -78,6 +78,18 @@ url_to_module_path('/pabilo_payment_gateway/static/src/js/payment_pabilo.js')
        required="use_payment_terminal == 'pabilo'"/>
 ```
 
+### 3b. Botones de `<header>` en listas
+
+Los dos toleran `<header>` dentro de `<tree>`, pero **solo lo muestran cuando hay
+filas seleccionadas**. En v17 existe la salida `display="always"`
+(`web/views/utils.js:239`, el valor por defecto es `"selection"`); en v16 no hay
+alternativa: `list_controller.xml:54` los envuelve en `t-if="nbSelected"`.
+
+Por eso el asistente "Agregar Método de Pago" se alcanza por el **menú de
+Pabilo** en ambas ramas —un botón que crea un registro nuevo no tiene nada que
+seleccionar— y solo la 17.0 conserva además el botón en la lista de métodos de
+pago, con `display="always"`.
+
 ### 4. Vista de Ajustes: estructura nueva
 
 En v17 `base.res_config_settings_view_form` es un `<form/>` **vacío**: ya no
