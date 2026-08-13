@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Odoo
+*.log
+.~lock.*
+
+# Entornos y editores
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Artefactos de empaquetado del addon
+/dist/
+*.zip
+
+# Secretos y configuración local. NO versionar: contienen appKey de Pabilo,
+# IDs de cuentas bancarias y contraseñas de Odoo.
+/CREDENCIALES.local.md
+/scripts/seed-pagomovil.ps1
+/credentials.png
+/host.txt
+/inicialmd
+*.local.md
+*.local.ps1

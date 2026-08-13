@@ -1,6 +1,6 @@
 import logging
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
 _logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class PosPaymentMethod(models.Model):
         """
         self.ensure_one()
         if not self.env.user.has_group('point_of_sale.group_pos_user'):
-            raise AccessError('Solo usuarios del Punto de Venta pueden verificar pagos Pabilo.')
+            raise AccessError(_('Solo usuarios del Punto de Venta pueden verificar pagos Pabilo.'))
 
         user_bank = self.pabilo_user_bank_id
         if user_bank_id:
@@ -52,9 +52,12 @@ class PosPaymentMethod(models.Model):
             if candidate and candidate.company_id == self.env.company and not candidate.is_trashed:
                 user_bank = candidate
         if not user_bank:
-            # Si no se configuró, buscar la primera disponible
+            # Si no se configuró, buscar la primera disponible. Excluye las
+            # eliminadas: la sincronización marca así las que ya no existen en
+            # Pabilo, y verificar contra ellas fallaría siempre.
             user_bank = self.env['pabilo.user.bank'].search(
-                [('company_id', '=', self.env.company.id)], limit=1
+                [('company_id', '=', self.env.company.id), ('is_trashed', '=', False)],
+                limit=1,
             )
         if not user_bank:
             return {
@@ -64,7 +67,8 @@ class PosPaymentMethod(models.Model):
                 'is_new': False,
                 'credit_cost': 0.0,
                 'error_code': 'NO_USER_BANK',
-                'message': 'No hay cuentas bancarias de Pabilo configuradas. Sincronízalas desde los Ajustes.',
+                'message': _('No hay cuentas bancarias de Pabilo configuradas. '
+                             'Sincronízalas desde los Ajustes.'),
             }
 
         return self.env['pabilo.client'].verify_payment(user_bank, reference, amount)
@@ -73,7 +77,7 @@ class PosPaymentMethod(models.Model):
         """Cuentas Pabilo disponibles para elegir en el POS al cobrar."""
         self.ensure_one()
         if not self.env.user.has_group('point_of_sale.group_pos_user'):
-            raise AccessError('Solo usuarios del Punto de Venta pueden consultar las cuentas Pabilo.')
+            raise AccessError(_('Solo usuarios del Punto de Venta pueden consultar las cuentas Pabilo.'))
         banks = self.env['pabilo.user.bank'].search([
             ('company_id', '=', self.env.company.id),
             ('is_trashed', '=', False),

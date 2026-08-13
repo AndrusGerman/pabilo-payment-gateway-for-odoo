@@ -7,7 +7,8 @@ class PosPayment(models.Model):
     pabilo_reference = fields.Char(
         string='Referencia Pabilo',
         readonly=True,
-        help='Referencia del pago móvil verificada vía Pabilo (betaserio).',
+        help='Referencia bancaria verificada vía Pabilo: pago móvil, '
+             'transferencia o Binance.',
     )
     pabilo_payment_id = fields.Char(
         string='ID Pago Pabilo',

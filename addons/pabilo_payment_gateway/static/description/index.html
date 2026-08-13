@@ -1,0 +1,135 @@
+<section style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c2026;">
+
+  <div style="text-align:center;padding:0 0 24px;">
+    <img src="banner.png" alt="Pabilo Payment Gateway" style="max-width:100%;height:auto;"/>
+  </div>
+
+  <div style="max-width:960px;margin:0 auto;padding:0 16px;">
+
+    <h2 style="font-size:30px;font-weight:700;margin:32px 0 12px;">
+      Cobra pago móvil sin salir de la pantalla de pago
+    </h2>
+    <p style="font-size:17px;line-height:1.6;color:#4a525c;">
+      En Venezuela el cliente paga y muestra la referencia. Verificarla a mano
+      significa abrir la app del banco, buscar el movimiento y volver al POS con
+      la cola esperando. Este módulo lo resuelve dentro de Odoo: el cajero teclea
+      los <b>últimos 6 dígitos</b> de la referencia y Odoo confirma el cobro
+      contra el banco en segundos.
+    </p>
+
+    <hr style="margin:36px 0;border:0;border-top:1px solid #e6e8eb;"/>
+
+    <h3 style="font-size:24px;font-weight:700;margin:0 0 20px;">Cómo funciona</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:16px;">
+      <tr>
+        <td style="width:56px;vertical-align:top;padding:12px 0;">
+          <div style="width:38px;height:38px;border-radius:19px;background:#F07C29;color:#fff;text-align:center;line-height:38px;font-weight:700;">1</div>
+        </td>
+        <td style="vertical-align:top;padding:12px 0;color:#4a525c;">
+          El cliente paga por <b>pago móvil, transferencia o Binance</b> a tu cuenta.
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align:top;padding:12px 0;">
+          <div style="width:38px;height:38px;border-radius:19px;background:#F07C29;color:#fff;text-align:center;line-height:38px;font-weight:700;">2</div>
+        </td>
+        <td style="vertical-align:top;padding:12px 0;color:#4a525c;">
+          En el POS el cajero elige el método <b>Pabilo</b> y teclea los 6 últimos
+          dígitos de la referencia en un teclado numérico.
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align:top;padding:12px 0;">
+          <div style="width:38px;height:38px;border-radius:19px;background:#F07C29;color:#fff;text-align:center;line-height:38px;font-weight:700;">3</div>
+        </td>
+        <td style="vertical-align:top;padding:12px 0;color:#4a525c;">
+          Odoo consulta el banco a través de Pabilo y confirma la línea de pago.
+          Si el pago aún no ha llegado, <b>reintenta solo</b> durante 30 segundos
+          en vez de fallar.
+        </td>
+      </tr>
+    </table>
+
+    <hr style="margin:36px 0;border:0;border-top:1px solid #e6e8eb;"/>
+
+    <h3 style="font-size:24px;font-weight:700;margin:0 0 20px;">Qué incluye</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:16px;color:#4a525c;">
+      <tr>
+        <td style="width:50%;vertical-align:top;padding:10px 24px 10px 0;">
+          <b style="color:#1c2026;">Un método, tres medios</b><br/>
+          Pago móvil, transferencias y Binance con el mismo método de pago.
+        </td>
+        <td style="width:50%;vertical-align:top;padding:10px 0;">
+          <b style="color:#1c2026;">Varias cuentas bancarias</b><br/>
+          Si tienes más de una cuenta, el cajero elige a cuál llegó el pago.
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align:top;padding:10px 24px 10px 0;">
+          <b style="color:#1c2026;">Sin cobros duplicados</b><br/>
+          Una referencia ya usada se rechaza, así el mismo pago no salda dos ventas.
+        </td>
+        <td style="vertical-align:top;padding:10px 0;">
+          <b style="color:#1c2026;">Trazabilidad</b><br/>
+          La referencia y el ID de Pabilo quedan guardados en el pago del POS
+          y salen en el recibo.
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align:top;padding:10px 24px 10px 0;">
+          <b style="color:#1c2026;">Errores en claro</b><br/>
+          «El monto no coincide», «el pago aún no aparece en el banco»: el cajero
+          ve el motivo real, no un error genérico.
+        </td>
+        <td style="vertical-align:top;padding:10px 0;">
+          <b style="color:#1c2026;">Cuentas sincronizadas</b><br/>
+          Tus cuentas de Pabilo se sincronizan a Odoo en modo solo lectura.
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align:top;padding:10px 24px 10px 0;">
+          <b style="color:#1c2026;">También fuera del POS</b><br/>
+          Verificación manual y enlaces de pago desde las transacciones de pago.
+        </td>
+        <td style="vertical-align:top;padding:10px 0;">
+          <b style="color:#1c2026;">Multi-moneda</b><br/>
+          VEF, USD y EUR.
+        </td>
+      </tr>
+    </table>
+
+    <hr style="margin:36px 0;border:0;border-top:1px solid #e6e8eb;"/>
+
+    <h3 style="font-size:24px;font-weight:700;margin:0 0 16px;">Configuración</h3>
+    <ol style="font-size:16px;line-height:1.8;color:#4a525c;padding-left:22px;">
+      <li>Instala el módulo.</li>
+      <li>En <b>Ajustes → Pabilo</b>, pega tu API Key (appKey) y pulsa
+          <b>Sincronizar Cuentas</b>.</li>
+      <li>En <b>Punto de Venta → Métodos de Pago</b>, pulsa
+          <b>Agregar Método Pabilo</b>, elige la cuenta bancaria y guarda.</li>
+      <li>Añade el método de pago a tu punto de venta. Listo.</li>
+    </ol>
+
+    <div style="background:#fdf0e7;border-left:4px solid #F07C29;padding:18px 22px;margin:32px 0;font-size:16px;color:#4a525c;">
+      <b style="color:#1c2026;">Requiere una cuenta en Pabilo.</b><br/>
+      Este módulo es el conector con el servicio de verificación de pagos
+      <a href="https://pabilo.app" style="color:#F07C29;text-decoration:none;">pabilo.app</a>,
+      donde se administran las cuentas bancarias y las credenciales.
+      Las credenciales de tu banco nunca se guardan en Odoo.
+    </div>
+
+    <hr style="margin:36px 0;border:0;border-top:1px solid #e6e8eb;"/>
+
+    <h3 style="font-size:24px;font-weight:700;margin:0 0 12px;">Compatibilidad</h3>
+    <p style="font-size:16px;line-height:1.7;color:#4a525c;">
+      Odoo 16.0, ediciones Community y Enterprise. Requiere los módulos
+      <i>Punto de Venta</i>, <i>Contabilidad</i> y <i>Pagos</i>.
+    </p>
+
+    <p style="font-size:14px;color:#8b939c;margin-top:40px;">
+      Bancos soportados vía Pabilo: Banco de Venezuela, Provincial, Mercantil,
+      Banesco, Banco Plaza, Binance Pay y cuentas por notificación.
+    </p>
+
+  </div>
+</section>

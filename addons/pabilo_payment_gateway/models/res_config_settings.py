@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import _, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -27,7 +27,7 @@ class ResConfigSettings(models.TransientModel):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Sincronización Completa' if ok else 'Error de Sincronización',
+                'title': _('Sincronización Completa') if ok else _('Error de Sincronización'),
                 'message': message,
                 'sticky': not ok,
                 'type': 'success' if ok else 'warning',

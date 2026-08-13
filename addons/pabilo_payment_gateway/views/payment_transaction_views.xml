@@ -10,7 +10,7 @@
                     <page string="Verificación Pabilo" name="pabilo_verify">
                         <group>
                             <group string="Datos del Pago">
-                                <field name="pabilo_user_bank_id"/>
+                                <field name="pabilo_user_bank_id" options="{'no_create': True}"/>
                                 <field name="pabilo_reference"/>
                                 <field name="pabilo_movement_type"/>
                             </group>

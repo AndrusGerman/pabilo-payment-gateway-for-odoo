@@ -48,16 +48,21 @@
         <field name="context">{'module' : 'pabilo_payment_gateway', 'bin_size': False}</field>
     </record>
 
-    <menuitem id="menu_pabilo_root" name="Pabilo" sequence="100"/>
-    
-    <menuitem id="menu_pabilo_config" 
-              name="Configuración" 
-              parent="menu_pabilo_root" 
-              sequence="10"/>
-              
-    <menuitem id="menu_pabilo_config_settings" 
-              name="Ajustes Pabilo" 
-              parent="menu_pabilo_config" 
-              sequence="10" 
+    <menuitem id="menu_pabilo_root"
+              name="Pabilo"
+              sequence="100"
+              web_icon="pabilo_payment_gateway,static/description/icon.png"/>
+
+    <menuitem id="menu_pabilo_config"
+              name="Configuración"
+              parent="menu_pabilo_root"
+              sequence="10"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_pabilo_config_settings"
+              name="Ajustes Pabilo"
+              parent="menu_pabilo_config"
+              sequence="10"
+              groups="base.group_system"
               action="action_pabilo_config_settings"/>
 </odoo>

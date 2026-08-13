@@ -2,7 +2,7 @@ import logging
 
 import requests
 
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class PaymentTransaction(models.Model):
         self.ensure_one()
         api_key = self.env['pabilo.client']._api_key(provider=self.provider_id)
         if not api_key:
-            raise UserError('El API Key de Pabilo no está configurado.')
+            raise UserError(_('El API Key de Pabilo no está configurado.'))
         return api_key
 
     def _pabilo_headers(self, api_key):
@@ -72,9 +72,9 @@ class PaymentTransaction(models.Model):
         """Verifica un pago contra la API de Pabilo usando betaserio."""
         for record in self:
             if not record.pabilo_reference:
-                raise UserError('Ingresa la referencia de pago.')
+                raise UserError(_('Ingresa la referencia de pago.'))
             if not record.pabilo_user_bank_id:
-                raise UserError('Selecciona una Cuenta Pabilo.')
+                raise UserError(_('Selecciona una Cuenta Pabilo.'))
 
             result = self.env['pabilo.client'].verify_payment(
                 record.pabilo_user_bank_id,
@@ -93,7 +93,7 @@ class PaymentTransaction(models.Model):
                 })
                 record._set_done()
             else:
-                raise UserError(f"Pabilo: {result['message']}")
+                raise UserError(_('Pabilo: %s', result['message']))
 
     # ==========================================
     # Enlace de pago (Payment Link)
@@ -102,7 +102,7 @@ class PaymentTransaction(models.Model):
         """Crea un enlace de pago en Pabilo para esta transacción."""
         for record in self:
             if not record.pabilo_user_bank_id:
-                raise UserError('Selecciona una Cuenta Pabilo para el enlace de pago.')
+                raise UserError(_('Selecciona una Cuenta Pabilo para el enlace de pago.'))
 
             api_key = record._get_pabilo_api_key()
 
@@ -125,6 +125,10 @@ class PaymentTransaction(models.Model):
                 'user_bank_id': record.pabilo_user_bank_id.pabilo_id,
                 'currency': pabilo_currency,
                 'name': record.reference or '',
+                # Obligatorios: el backend valida ambos con IsValid() y responde
+                # 400 "invalid payment link type/origin" si faltan.
+                'type': 'default',
+                'payment_link_origin': 'api',
             }
             if webhook_url:
                 payload['webhook_url'] = webhook_url
@@ -161,17 +165,17 @@ class PaymentTransaction(models.Model):
                         'target': 'new',
                     }
                 else:
-                    raise UserError(f"Error creando enlace ({resp.status_code}): {resp.text}")
+                    raise UserError(_('Error creando enlace (%s): %s', resp.status_code, resp.text))
 
             except requests.exceptions.RequestException as e:
                 _logger.error("Pabilo payment link error: %s", e)
-                raise UserError("No se pudo conectar con Pabilo.")
+                raise UserError(_('No se pudo conectar con Pabilo.'))
 
     def action_check_pabilo_payment_link(self):
         """Consulta el estado de un enlace de pago ya creado."""
         for record in self:
             if not record.pabilo_payment_link_id:
-                raise UserError('No hay enlace de pago asociado.')
+                raise UserError(_('No hay enlace de pago asociado.'))
 
             api_key = record._get_pabilo_api_key()
             url = f'{record._pabilo_base_url()}/paymentlink/{record.pabilo_payment_link_id}/info'
@@ -197,14 +201,14 @@ class PaymentTransaction(models.Model):
                         'type': 'ir.actions.client',
                         'tag': 'display_notification',
                         'params': {
-                            'title': 'Estado del Enlace',
-                            'message': f'Estado actual: {status}',
+                            'title': _('Estado del Enlace'),
+                            'message': _('Estado actual: %s', status),
                             'sticky': False,
                             'type': 'info' if status != 'paid' else 'success',
                         }
                     }
                 else:
-                    raise UserError(f"Error consultando enlace: {resp.text}")
+                    raise UserError(_('Error consultando enlace: %s', resp.text))
             except requests.exceptions.RequestException as e:
                 _logger.error("Pabilo link check error: %s", e)
-                raise UserError("No se pudo conectar con Pabilo.")
+                raise UserError(_('No se pudo conectar con Pabilo.'))

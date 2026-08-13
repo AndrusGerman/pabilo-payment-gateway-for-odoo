@@ -2,26 +2,28 @@ import logging
 
 import requests
 
-from odoo import api, models
+from odoo import _, _lt, api, models
 
 _logger = logging.getLogger(__name__)
 
 PABILO_DEFAULT_API_URL = 'https://api.pabilo.app'
 
-# Códigos de error del backend (internal/core/domain/errors.go) -> mensaje para el cajero.
+# Códigos de error del backend (internal/core/domain/errors.go) -> mensaje para el
+# cajero. Con _lt (lazy) y no _(): el diccionario se evalúa al importar el módulo,
+# cuando todavía no hay usuario ni idioma. La traducción se resuelve al usarlo.
 PABILO_ERROR_MESSAGES = {
-    'PAYMENT_NOT_FOUND': 'El pago aún no aparece en el banco.',
-    'PAYMENT_AMOUNT_NOT_VALID': 'La referencia existe pero el monto no coincide.',
-    'NOT_ENOUGH_CREDITS': 'Sin créditos en Pabilo.',
-    'USER_BANK_IS_DISABLED': 'La cuenta bancaria de Pabilo está deshabilitada.',
-    'USER_BANCK_BLOCKED': 'La cuenta bancaria está bloqueada por el banco; actualiza las credenciales en Pabilo.',
-    'MOVEMENT_TYPE_REQUIRED': 'Esta cuenta requiere elegir tipo de movimiento.',
-    'IS_NOT_POSITIVE_PAYMENT': 'El movimiento encontrado no es un abono.',
-    'UNAUTHORIZED': 'API Key de Pabilo inválido.',
-    'PLAN_IS_NOT_ACTIVE': 'La cuenta de Pabilo no tiene un plan activo.',
-    'USER_IS_NOT_ACTIVE': 'El usuario de Pabilo no está activo.',
-    'CLIENT_IS_NOT_ACTIVE': 'El cliente de Pabilo no está activo.',
-    'REQUEST_LIMIT_REACHED': 'Límite de consultas del plan de Pabilo alcanzado.',
+    'PAYMENT_NOT_FOUND': _lt('El pago aún no aparece en el banco.'),
+    'PAYMENT_AMOUNT_NOT_VALID': _lt('La referencia existe pero el monto no coincide.'),
+    'NOT_ENOUGH_CREDITS': _lt('Sin créditos en Pabilo.'),
+    'USER_BANK_IS_DISABLED': _lt('La cuenta bancaria de Pabilo está deshabilitada.'),
+    'USER_BANCK_BLOCKED': _lt('La cuenta bancaria está bloqueada por el banco; actualiza las credenciales en Pabilo.'),
+    'MOVEMENT_TYPE_REQUIRED': _lt('Esta cuenta requiere elegir tipo de movimiento.'),
+    'IS_NOT_POSITIVE_PAYMENT': _lt('El movimiento encontrado no es un abono.'),
+    'UNAUTHORIZED': _lt('API Key de Pabilo inválido.'),
+    'PLAN_IS_NOT_ACTIVE': _lt('La cuenta de Pabilo no tiene un plan activo.'),
+    'USER_IS_NOT_ACTIVE': _lt('El usuario de Pabilo no está activo.'),
+    'CLIENT_IS_NOT_ACTIVE': _lt('El cliente de Pabilo no está activo.'),
+    'REQUEST_LIMIT_REACHED': _lt('Límite de consultas del plan de Pabilo alcanzado.'),
 }
 
 # Único error ante el cual tiene sentido reintentar: el pago puede tardar segundos
@@ -65,7 +67,7 @@ class PabiloClient(models.AbstractModel):
         if not api_key:
             return None, {
                 'error': 'NO_API_KEY',
-                'message': 'El API Key de Pabilo no está configurado (Ajustes → Pabilo).',
+                'message': _('El API Key de Pabilo no está configurado (Ajustes → Pabilo).'),
             }
         url = f'{self._base_url()}{path}'
         headers = {'Content-Type': 'application/json', 'appKey': api_key}
@@ -75,7 +77,7 @@ class PabiloClient(models.AbstractModel):
             _logger.error("Pabilo connection error %s %s: %s", method, url, e)
             return None, {
                 'error': 'CONNECTION_ERROR',
-                'message': 'No se pudo conectar con Pabilo. Verifique la URL base y la red.',
+                'message': _('No se pudo conectar con Pabilo. Verifique la URL base y la red.'),
             }
         try:
             body = resp.json()
@@ -123,13 +125,20 @@ class PabiloClient(models.AbstractModel):
             })
             result['verified'] = result['status'] == 'paid'
             if not result['verified']:
-                result['message'] = f"Pago no verificado. Estado: {result['status'] or 'desconocido'}"
+                result['message'] = _('Pago no verificado. Estado: %s',
+                                      result['status'] or _('desconocido'))
             return result
 
         # Error: el backend responde {"message": ..., "error": "CODE"} (middleware/error.go)
         error_code = body.get('error') or ('HTTP_%s' % http_status)
         result['error_code'] = error_code
-        result['message'] = PABILO_ERROR_MESSAGES.get(error_code) or body.get('message') or 'Error desconocido de Pabilo.'
+        # str() obligatorio: los valores del mapa son _lt (perezosos) y este dict
+        # viaja por JSON-RPC hasta el POS, que no sabe serializarlos.
+        result['message'] = str(
+            PABILO_ERROR_MESSAGES.get(error_code)
+            or body.get('message')
+            or _('Error desconocido de Pabilo.')
+        )
         result['status'] = 'failed'
         _logger.info("Pabilo verify failed ref=%s: %s %s", reference, error_code, result['message'])
         return result
@@ -144,5 +153,9 @@ class PabiloClient(models.AbstractModel):
                 banks = body.get('data') or []
             return True, banks, ''
         error_code = body.get('error', '')
-        message = PABILO_ERROR_MESSAGES.get(error_code) or body.get('message') or 'Error consultando las cuentas de Pabilo.'
+        message = str(
+            PABILO_ERROR_MESSAGES.get(error_code)
+            or body.get('message')
+            or _('Error consultando las cuentas de Pabilo.')
+        )
         return False, [], message

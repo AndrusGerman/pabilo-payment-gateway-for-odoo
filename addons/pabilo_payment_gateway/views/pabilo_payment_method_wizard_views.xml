@@ -6,8 +6,8 @@
         <field name="arch" type="xml">
             <form string="Agregar Método de Pago Pabilo">
                 <p class="text-muted">
-                    Crea un método de pago del Punto de Venta que verifica pagos móviles
-                    y transferencias a través de Pabilo.
+                    Crea un método de pago del Punto de Venta que verifica pagos
+                    a través de Pabilo: pago móvil, transferencias y Binance.
                 </p>
                 <group>
                     <field name="company_id" invisible="1"/>

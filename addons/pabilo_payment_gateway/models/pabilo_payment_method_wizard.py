@@ -5,7 +5,9 @@ class PabiloPaymentMethodWizard(models.TransientModel):
     _name = 'pabilo.payment.method.wizard'
     _description = 'Asistente para crear un método de pago Pabilo'
 
-    name = fields.Char(string='Nombre', required=True, default='Pago Móvil Pabilo')
+    # Nombre neutro a propósito: el mismo método verifica pago móvil,
+    # transferencias y Binance, así que no puede llamarse por un solo medio.
+    name = fields.Char(string='Nombre', required=True, default='Pabilo')
     pabilo_user_bank_id = fields.Many2one(
         'pabilo.user.bank',
         string='Cuenta Bancaria Pabilo',

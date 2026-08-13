@@ -114,7 +114,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 : '';
 
             const { confirmed, payload: reference } = await Gui.showPopup('NumberPopup', {
-                title: _t('Referencia del pago móvil'),
+                title: _t('Referencia del pago'),
                 body: _.str.sprintf(
                     _t('%sMonto: %s. Ingrese los últimos 6 dígitos de la referencia.'),
                     accountHint,

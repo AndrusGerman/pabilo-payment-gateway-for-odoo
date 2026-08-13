@@ -1,0 +1,1013 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* pabilo_payment_gateway
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0-20250909\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-13 01:18+0000\n"
+"PO-Revision-Date: 2026-08-13 01:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "%sMonto: %s. Ingrese los últimos 6 dígitos de la referencia."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.payment_provider_form_pabilo
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "API Key (appKey)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "API Key de Pabilo inválido."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__active
+msgid "Activo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pos_payment_method_view_tree_inherit_pabilo
+msgid "Agregar Método Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_payment_method_wizard
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_payment_method_wizard_view_form
+msgid "Agregar Método de Pago Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_config_settings
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_config_settings
+msgid "Ajustes Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pabilo_payment_method_wizard
+msgid "Asistente para crear un método de pago Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_ban_emp
+msgid "BDV Empresa v1"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_ban_emp_v2
+msgid "BDV Empresa v2"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_ban
+msgid "BDV Personal"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid ""
+"Backend de Pabilo. Local con Odoo en Docker: "
+"http://host.docker.internal:3349"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_bank_plaza_v1
+msgid "Banco Plaza"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_bank_plaza_qa_v1
+msgid "Banco Plaza QA"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_banesco_v1
+msgid "Banesco"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_banesco_qa_v1
+msgid "Banesco QA"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__binance_app
+msgid "Binance Pay"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__canceled
+msgid "Cancelado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_payment_method_wizard_view_form
+msgid "Cancelar"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pabilo_client
+msgid "Cliente HTTP de la API de Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_provider__code
+msgid "Code"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__company_id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__company_id
+msgid "Compañía"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Configura la llave para usar la API de Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "Configura primero el API Key de Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_config
+msgid "Configuración"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Consultar Estado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_payment_method_wizard_view_form
+msgid ""
+"Crea un método de pago del Punto de Venta que verifica pagos\n"
+"                    a través de Pabilo: pago móvil, transferencias y Binance."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Crear Enlace de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_payment_method_wizard_view_form
+msgid "Crear Método de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__create_uid
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__create_date
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_credit_cost
+msgid "Créditos Consumidos"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__pabilo_user_bank_id
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pos_payment_method_view_form_inherit_pabilo
+msgid "Cuenta Bancaria Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_account_hint
+msgid "Cuenta Destino"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_user_bank_id
+msgid "Cuenta Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
+msgid "Cuenta Pabilo por Defecto"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__c2p
+msgid "Cuenta a Persona (C2P)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_payment_transaction__pabilo_user_bank_id
+msgid "Cuenta bancaria de Pabilo donde se recibió el pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Cuenta bancaria destino"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Cuenta destino: %s. "
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_user_bank
+msgid "Cuentas Bancarias"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pabilo_user_bank
+msgid "Cuentas Bancarias de Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_user_bank
+msgid "Cuentas Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Datos del Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__name
+msgid "Descripción"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__stopped
+msgid "Detenido"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__journal_id
+msgid "Diario"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "El API Key de Pabilo no está configurado (Ajustes → Pabilo)."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "El API Key de Pabilo no está configurado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "El cliente de Pabilo no está activo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "El movimiento encontrado no es un abono."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "El pago aún no aparece en el banco."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "El pago no pudo ser verificado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "El usuario de Pabilo no está activo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__is_trashed
+msgid "Eliminado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Enlace"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Enlace de Pago Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Error consultando enlace: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Error consultando las cuentas de Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Error creando enlace (%s): %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Error de Conexión"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#, python-format
+msgid "Error de Sincronización"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Error de Verificación Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Error desconocido de Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_is_new
+msgid "Es Nuevo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.constraint,message:pabilo_payment_gateway.constraint_pabilo_user_bank_pabilo_id_company_uniq
+msgid "Esta cuenta de Pabilo ya está sincronizada en esta compañía."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Esta cuenta requiere elegir tipo de movimiento."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid ""
+"Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_payment_link_status
+msgid "Estado Enlace"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_status
+msgid "Estado Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Estado actual: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Estado del Enlace"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_user_bank_view_form
+msgid ""
+"Estas cuentas son un espejo de solo lectura de Pabilo.\n"
+"                        Para modificarlas, edítalas en Pabilo y luego pulsa\n"
+"                        <b>Ajustes → Pabilo → Sincronizar Cuentas</b>."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__expired
+msgid "Expirado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__failed
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_status__failed
+msgid "Fallido"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment__pabilo_is_new
+msgid ""
+"False si la referencia ya había sido verificada antes (posible duplicado)."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__generic
+msgid "Genérico (cualquier tipo)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__id
+msgid "ID"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_payment_link_id
+msgid "ID Enlace Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_payment_id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment__pabilo_payment_id
+msgid "ID Pago Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment__pabilo_payment_id
+msgid "ID del user_bank_payment en Pabilo, para trazabilidad cruzada."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__pabilo_id
+msgid "ID en Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Ingresa la referencia de pago."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_res_config_settings__pabilo_api_key
+msgid "Introduce tu appKey de Pabilo para verificar pagos"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_payment_method_wizard__pabilo_user_bank_id
+msgid ""
+"La cuenta bancaria de Pabilo donde se verificarán los pagos recibidos con "
+"este método."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
+msgid ""
+"La cuenta bancaria de Pabilo donde se verificarán los pagos recibidos en "
+"este POS."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "La cuenta bancaria de Pabilo está deshabilitada."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid ""
+"La cuenta bancaria está bloqueada por el banco; actualiza las credenciales "
+"en Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "La cuenta de Pabilo no tiene un plan activo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "La referencia existe pero el monto no coincide."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_user_bank
+msgid ""
+"Las cuentas bancarias se administran en Pabilo y aquí solo se consultan.\n"
+"                Configura tu API Key en <b>Ajustes → Pabilo</b> y pulsa\n"
+"                <b>Sincronizar Cuentas</b>."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid ""
+"Las cuentas de Pabilo son un espejo de solo lectura.\n"
+"\n"
+"Para modificarlas, edítalas en Pabilo y luego pulsa Ajustes → Pabilo → Sincronizar Cuentas."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard____last_update
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_uid
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_date
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Límite de consultas del plan de Pabilo alcanzado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__mercantil_emp_v1
+msgid "Mercantil Empresa"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__mercantil_emp_test_v1
+msgid "Mercantil Empresa (Test)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid ""
+"No hay cuentas bancarias de Pabilo configuradas. Sincronízalas desde los "
+"Ajustes."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "No hay enlace de pago asociado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "No se pudo conectar con Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "No se pudo conectar con Pabilo. Verifique la URL base y la red."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "No se pudo conectar con Pabilo. Verifique su conexión a internet."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__name
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__display_name
+msgid "Nombre"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__notification_account
+msgid "Notificación"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__account_number
+msgid "Número de Cuenta"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_payment_transaction__pabilo_reference
+msgid "Número de referencia del pago (Pago Móvil, Binance, Transferencia)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_payment_method_wizard__journal_id
+msgid "Opcional. Diario contable donde se registrarán los pagos."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_provider__code__pabilo
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_root
+#: model:payment.provider,name:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Pabilo API Configuration"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_res_company__pabilo_api_key
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_res_config_settings__pabilo_api_key
+msgid "Pabilo API Key"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_provider__pabilo_api_key
+msgid "Pabilo API Key (appKey)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Pabilo Payment"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid ""
+"Pabilo ref: %s\n"
+"Cuenta: %s\n"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Pabilo: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__paid
+msgid "Pagado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__movil_pay
+msgid "Pago Móvil"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment__pabilo_is_new
+msgid "Pago Nuevo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Pago no encontrado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Pago no verificado. Estado: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Pago ya registrado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_payment_provider
+msgid "Payment Provider"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_payment_transaction
+msgid "Payment Transaction"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__pending
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_status__pending
+msgid "Pendiente"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pos_order
+msgid "Point of Sale Orders"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pos_payment_method
+msgid "Point of Sale Payment Methods"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pos_payment
+msgid "Point of Sale Payments"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pos_session
+msgid "Point of Sale Session"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__provider
+msgid "Proveedor Bancario"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_prov_emp
+msgid "Provincial Empresa"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__ve_prov
+msgid "Provincial Personal"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_reference
+msgid "Referencia Bancaria"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment__pabilo_reference
+msgid "Referencia Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment__pabilo_reference
+msgid ""
+"Referencia bancaria verificada vía Pabilo: pago móvil, transferencia o "
+"Binance."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Referencia del pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Resultado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "Se han sincronizado %s cuentas bancarias con Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Selecciona una Cuenta Pabilo para el enlace de pago."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
+#, python-format
+msgid "Selecciona una Cuenta Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "Sin créditos en Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#, python-format
+msgid "Sincronización Completa"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Sincronizar Cuentas Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid "Solo usuarios del Punto de Venta pueden consultar las cuentas Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid "Solo usuarios del Punto de Venta pueden verificar pagos Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__supports_payment_link
+msgid "Soporta Enlaces de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__bank_test
+msgid "Test"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment_method__pabilo_account_hint
+msgid ""
+"Texto de ayuda que ve el cajero en el POS: a qué cuenta debe llegar el pago."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_payment_provider__code
+msgid "The technical code of this payment provider."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__account_type
+msgid "Tipo de Cuenta"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_movement_type
+msgid "Tipo de Movimiento"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_user_bank
+msgid "Todavía no hay cuentas sincronizadas"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__transfer
+msgid "Transferencia Bancaria"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.payment_provider_form_pabilo
+msgid "Tu API Key de Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "URL Base"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_res_config_settings__pabilo_api_url
+msgid "URL Base de Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_payment_link_url
+msgid "URL Enlace de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_res_config_settings__pabilo_api_url
+msgid ""
+"URL del backend de Pabilo. Para un backend local con Odoo en Docker: "
+"http://host.docker.internal:3349 (127.0.0.1 apuntaría al propio contenedor)."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Verificación Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_status__verified
+msgid "Verificado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
+msgid "Verificar Pago (betaserio)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,auth_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been authorized."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,cancel_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been cancelled."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,pending_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid ""
+"Your payment has been successfully processed but is waiting for approval."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,done_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been successfully processed. Thank you!"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
+#, python-format
+msgid "desconocido"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "¿A cuál de estas cuentas envió el cliente el pago?"
+msgstr ""
