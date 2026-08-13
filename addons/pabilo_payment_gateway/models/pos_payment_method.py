@@ -78,6 +78,9 @@ class PosPaymentMethod(models.Model):
         self.ensure_one()
         if not self.env.user.has_group('point_of_sale.group_pos_user'):
             raise AccessError(_('Solo usuarios del Punto de Venta pueden consultar las cuentas Pabilo.'))
+        # Refresca solo si hace falta. Así una cuenta agregada en Pabilo aparece
+        # en el POS sin que nadie tenga que acordarse de pulsar "Sincronizar".
+        self.env['pabilo.user.bank']._sync_if_stale()
         banks = self.env['pabilo.user.bank'].search([
             ('company_id', '=', self.env.company.id),
             ('is_trashed', '=', False),

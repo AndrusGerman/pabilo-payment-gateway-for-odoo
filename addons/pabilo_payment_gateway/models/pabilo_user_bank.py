@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
@@ -93,6 +94,48 @@ class PabiloUserBank(models.Model):
         self._assert_sync_context()
         return super().unlink()
 
+    # -- Sincronización automática ----------------------------------------
+    # Obligar a pulsar un botón para tener las cuentas al día es una fuente
+    # silenciosa de errores: si alguien agrega una cuenta en Pabilo y nadie
+    # sincroniza, el cajero no la ve y verifica contra la equivocada. Por eso
+    # se refresca sola cuando hace falta, y el botón queda solo para forzarla.
+
+    SYNC_MAX_AGE_MINUTES = 60
+
+    @api.model
+    def _sync_if_stale(self, max_age_minutes=None):
+        """Sincroniza si el espejo está vacío o viejo. Nunca lanza excepción:
+        se llama desde el POS, y un fallo de red no puede romper un cobro."""
+        company = self.env.company.sudo()
+        if not company.pabilo_api_key:
+            return False
+
+        max_age = max_age_minutes or self.SYNC_MAX_AGE_MINUTES
+        last = company.pabilo_last_sync
+        if last and (fields.Datetime.now() - last) < timedelta(minutes=max_age):
+            has_any = self.sudo().search_count([('company_id', '=', company.id)])
+            if has_any:
+                return False
+
+        try:
+            ok, message = self.action_sync_banks()
+            if not ok:
+                _logger.warning("Pabilo auto-sync falló: %s", message)
+            return ok
+        except Exception:
+            _logger.exception("Pabilo auto-sync lanzó excepción")
+            return False
+
+    @api.model
+    def _cron_sync_banks(self):
+        """Red de seguridad diaria: refresca todas las compañías con appKey."""
+        companies = self.env['res.company'].sudo().search([('pabilo_api_key', '!=', False)])
+        for company in companies:
+            try:
+                self.with_company(company).action_sync_banks()
+            except Exception:
+                _logger.exception("Pabilo cron sync falló para %s", company.name)
+
     def action_sync_banks(self):
         """Sincroniza las cuentas bancarias de la compañía actual desde Pabilo.
 
@@ -168,6 +211,8 @@ class PabiloUserBank(models.Model):
         ])
         if stale:
             stale.write({'is_trashed': True})
+
+        company.sudo().pabilo_last_sync = fields.Datetime.now()
 
         _logger.info("Pabilo: sincronizadas %d cuentas para %s (%d marcadas eliminadas)",
                      synced, company.name, len(stale))

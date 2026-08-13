@@ -38,6 +38,7 @@ Una cuenta en https://pabilo.app con su API Key (appKey).
     'data': [
         'security/ir.model.access.csv',
         'data/ir_config_parameter.xml',
+        'data/ir_cron.xml',
         'data/payment_provider_data.xml',
         'views/res_config_settings_views.xml',
         'views/payment_provider_views.xml',

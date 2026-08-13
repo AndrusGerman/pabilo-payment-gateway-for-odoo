@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Red de seguridad. El refresco normal es perezoso (al abrir el
+             asistente o al cobrar en el POS); esto cubre el caso de una
+             instancia que pasa dias sin cobrar y arranca con datos viejos. -->
+        <record id="ir_cron_pabilo_sync_banks" model="ir.cron">
+            <field name="name">Pabilo: sincronizar cuentas bancarias</field>
+            <field name="model_id" ref="model_pabilo_user_bank"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_sync_banks()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>
