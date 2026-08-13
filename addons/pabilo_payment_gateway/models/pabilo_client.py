@@ -26,9 +26,14 @@ PABILO_ERROR_MESSAGES = {
     'REQUEST_LIMIT_REACHED': _lt('Límite de consultas del plan de Pabilo alcanzado.'),
 }
 
-# Único error ante el cual tiene sentido reintentar: el pago puede tardar segundos
-# en aparecer en el banco.
-PABILO_RETRYABLE_ERRORS = {'PAYMENT_NOT_FOUND'}
+# Ningún error de dominio se reintenta. PAYMENT_NOT_FOUND parecía la excepción,
+# pero no lo es: el backend ya consultó el banco antes de responderlo, así que
+# volver a preguntar da lo mismo. Es un dato firme, igual que un monto que no
+# coincide o una referencia ya usada: se muestra y se corta.
+#
+# Lo que sí puede tardar es la consulta al banco, y para eso está el timeout
+# largo de verify_payment en vez de varios intentos cortos.
+VERIFY_TIMEOUT_SECONDS = 110
 
 
 class PabiloClient(models.AbstractModel):
@@ -89,7 +94,8 @@ class PabiloClient(models.AbstractModel):
         return resp.status_code, body
 
     @api.model
-    def verify_payment(self, user_bank, reference, amount, movement_type='GENERIC', provider=None):
+    def verify_payment(self, user_bank, reference, amount, movement_type='GENERIC',
+                       provider=None, source_name=''):
         """Verifica un pago vía betaserio.
 
         Devuelve un dict normalizado (nunca lanza excepciones de dominio):
@@ -108,10 +114,16 @@ class PabiloClient(models.AbstractModel):
         payload = {'bank_reference': reference, 'amount': amount}
         if movement_type:
             payload['movement_type'] = movement_type
+        # Identifica la caja/cajero que cobró. Con varias cajas contra la misma
+        # cuenta, sin esto los pagos son indistinguibles en Pabilo.
+        if source_name:
+            payload['source_name'] = source_name
 
+        # Timeout largo y una sola llamada: la consulta al banco puede tardar,
+        # pero la respuesta es firme, así que reintentar no aporta nada.
         http_status, body = self._request(
             'POST', f'/userbankpayment/{user_bank.pabilo_id}/betaserio',
-            payload=payload, provider=provider,
+            payload=payload, provider=provider, timeout=VERIFY_TIMEOUT_SECONDS,
         )
 
         if http_status == 200:
