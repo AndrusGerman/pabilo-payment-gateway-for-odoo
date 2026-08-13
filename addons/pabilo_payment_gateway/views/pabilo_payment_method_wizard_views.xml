@@ -31,31 +31,11 @@
         <field name="target">new</field>
     </record>
 
-    <record id="pos_payment_method_view_tree_inherit_pabilo" model="ir.ui.view">
-        <field name="name">pos.payment.method.tree.inherit.pabilo</field>
-        <field name="model">pos.payment.method</field>
-        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="inside">
-                <header>
-                    <!-- display="always": sin esto Odoo 17 solo muestra los
-                         botones de header al seleccionar filas (display por
-                         defecto "selection", ver web/views/utils.js), y este
-                         boton crea un registro nuevo: no hay nada que
-                         seleccionar. En Odoo 16 el atributo no existe, asi que
-                         alli el acceso es por el menu de Pabilo. -->
-                    <button name="%(action_pabilo_payment_method_wizard)d"
-                            type="action"
-                            display="always"
-                            string="Agregar Método Pabilo"
-                            class="btn-primary"/>
-                </header>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- El asistente tambien vive en el menu de Pabilo: es el unico acceso que
-         funciona igual en 16 y 17, y no depende de estar en la lista correcta. -->
+    <!-- Odoo 16 no puede mostrar un botón de <header> en una lista salvo que
+         haya filas seleccionadas: el template lo envuelve en t-if="nbSelected"
+         (web/views/list/list_controller.xml:54) y no existe el display="always"
+         que sí trae la 17. Un botón que crea un registro nuevo no tiene nada
+         que seleccionar, así que aquí el acceso es únicamente por el menú. -->
     <menuitem id="menu_pabilo_payment_method"
               name="Agregar Método de Pago"
               parent="menu_pabilo_root"
