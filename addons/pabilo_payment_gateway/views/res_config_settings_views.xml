@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Pabilo" string="Pabilo Payment" data-key="pabilo_payment_gateway">
+                <div class="app_settings_block" string="Pabilo Payment" data-key="pabilo_payment_gateway">
                     <h2>Pabilo API Configuration</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-12 col-lg-6 o_setting_box">
@@ -28,6 +28,14 @@
                                         <field name="pabilo_api_url" class="o_light_label"/>
                                     </div>
                                     <div class="mt16">
+                                        <label for="pabilo_webhook_secret" string="Secreto del Webhook"/>
+                                        <div class="text-muted">
+                                            Debe coincidir con WEBHOOK_SIGN_SECRET del backend. Sin él,
+                                            los webhooks de enlaces de pago se rechazan.
+                                        </div>
+                                        <field name="pabilo_webhook_secret" class="o_light_label" widget="password"/>
+                                    </div>
+                                    <div class="mt16">
                                         <button name="action_pabilo_sync_banks" type="object" string="Sincronizar Cuentas Pabilo" class="btn-secondary" icon="fa-refresh"/>
                                     </div>
                                 </div>
@@ -38,7 +46,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <record id="action_pabilo_config_settings" model="ir.actions.act_window">
         <field name="name">Ajustes Pabilo</field>
         <field name="type">ir.actions.act_window</field>
