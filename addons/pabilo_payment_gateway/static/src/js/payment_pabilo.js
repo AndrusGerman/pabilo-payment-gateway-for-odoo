@@ -6,11 +6,14 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
     const rpc = require('web.rpc');
     const PaymentInterface = require('point_of_sale.PaymentInterface');
 
-    // Un pago móvil tarda segundos en aparecer en el banco: se reintenta solo
-    // mientras el backend responda PAYMENT_NOT_FOUND. Cualquier otro error corta.
-    const MAX_ATTEMPTS = 10;
-    const RETRY_DELAY_MS = 3000;
-    const RETRYABLE_ERROR = 'PAYMENT_NOT_FOUND';
+    // No se reintenta ningún error. "Pago no encontrado" parecía el caso a
+    // repetir, pero el backend ya consultó el banco antes de responderlo: es un
+    // dato firme, igual que un monto que no coincide o una referencia ya usada.
+    // Preguntar de nuevo da lo mismo y solo deja al cajero esperando.
+    //
+    // Lo que sí puede tardar es la consulta al banco, y para eso está el timeout
+    // largo de una sola llamada.
+    const VERIFY_TIMEOUT_MS = 115000;
 
     const PabiloPayment = PaymentInterface.extend({
         init: function (pos, payment_method) {
@@ -18,30 +21,31 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             this._pabilo_cancelled = false;
         },
 
-        _sleep_cancelable: function (ms) {
-            // Espera en tramos cortos para que "Cancelar" responda de inmediato.
-            const step = 250;
-            const chunks = Math.ceil(ms / step);
-            let promise = Promise.resolve();
-            for (let i = 0; i < chunks; i++) {
-                promise = promise.then(() => {
-                    if (this._pabilo_cancelled) {
-                        return Promise.resolve();
-                    }
-                    return new Promise((resolve) => setTimeout(resolve, step));
-                });
-            }
-            return promise;
+        // Identifica la caja y el cajero que cobran, para poder rastrear el pago
+        // desde Pabilo cuando varias cajas comparten la misma cuenta bancaria.
+        _source_name: function () {
+            const config = this.pos.config;
+            const cashier = this.pos.get_cashier && this.pos.get_cashier();
+            const parts = [config && config.name, cashier && cashier.name].filter(Boolean);
+            return parts.join(' - ').slice(0, 120);
         },
 
         _verify: function (reference, amount, bankId) {
+            // El timeout del RPC debe superar el del servidor (110 s) para que
+            // gane el mensaje real de Pabilo y no un error de red genérico.
             return rpc.query(
                 {
                     model: 'pos.payment.method',
                     method: 'pabilo_verify_payment',
-                    args: [[this.payment_method.id], reference, amount, bankId || null],
+                    args: [
+                        [this.payment_method.id],
+                        reference,
+                        amount,
+                        bankId || null,
+                        this._source_name(),
+                    ],
                 },
-                { shadow: true, timeout: 25000 }
+                { shadow: true, timeout: VERIFY_TIMEOUT_MS }
             );
         },
 
@@ -126,62 +130,53 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 return false;
             }
 
+            // 'waitingCard' es lo que pinta el spinner de "buscando" en la
+            // línea de pago. La llamada es única y puede tardar hasta 110 s, que
+            // es lo que el banco puede demorar en responder.
             line.set_payment_status('waitingCard');
 
-            let lastResult = null;
-            for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-                if (this._pabilo_cancelled) {
-                    return false;
-                }
-
-                try {
-                    lastResult = await this._verify(reference, amount, bankId);
-                } catch (error) {
-                    await Gui.showPopup('ErrorPopup', {
-                        title: _t('Error de Conexión'),
-                        body: _t('No se pudo conectar con Pabilo. Verifique su conexión a internet.'),
-                    });
-                    return false;
-                }
-
-                if (lastResult.verified) {
-                    if (!lastResult.is_new) {
-                        // El movimiento ya fue consumido por una venta anterior:
-                        // aceptarlo de nuevo cobraría dos veces el mismo pago.
-                        await Gui.showPopup('ErrorPopup', {
-                            title: _t('Pago ya registrado'),
-                            body: _t('Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo.'),
-                        });
-                        return false;
-                    }
-                    line.pabilo_reference = reference;
-                    line.pabilo_payment_id = lastResult.payment_id;
-                    line.pabilo_is_new = lastResult.is_new;
-                    line.set_payment_status('done');
-                    line.set_receipt_info(
-                        _.str.sprintf(_t('Pabilo ref: %s\nCuenta: %s\n'), reference, bankLabel || '-')
-                    );
-                    return true;
-                }
-
-                if (lastResult.error_code !== RETRYABLE_ERROR) {
-                    await Gui.showPopup('ErrorPopup', {
-                        title: _t('Error de Verificación Pabilo'),
-                        body: lastResult.message || _t('El pago no pudo ser verificado.'),
-                    });
-                    return false;
-                }
-
-                // PAYMENT_NOT_FOUND: el pago puede tardar unos segundos; reintentar.
-                if (attempt < MAX_ATTEMPTS) {
-                    console.info(`pabilo: pago no encontrado, reintento ${attempt}/${MAX_ATTEMPTS}`);
-                    await this._sleep_cancelable(RETRY_DELAY_MS);
-                }
+            let result = null;
+            try {
+                result = await this._verify(reference, amount, bankId);
+            } catch (error) {
+                await Gui.showPopup('ErrorPopup', {
+                    title: _t('Sin respuesta de Pabilo'),
+                    body: _t('La consulta tardó demasiado o no hubo conexión. Verifique la red e intente de nuevo.'),
+                });
+                return false;
             }
 
+            if (this._pabilo_cancelled) {
+                return false;
+            }
+
+            if (result.verified) {
+                if (!result.is_new) {
+                    // El movimiento ya fue consumido por una venta anterior:
+                    // aceptarlo de nuevo cobraría dos veces el mismo pago.
+                    await Gui.showPopup('ErrorPopup', {
+                        title: _t('Pago ya registrado'),
+                        body: _t('Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo.'),
+                    });
+                    return false;
+                }
+                line.pabilo_reference = reference;
+                line.pabilo_payment_id = result.payment_id;
+                line.pabilo_is_new = result.is_new;
+                line.set_payment_status('done');
+                line.set_receipt_info(
+                    _.str.sprintf(_t('Pabilo ref: %s\nCuenta: %s\n'), reference, bankLabel || '-')
+                );
+                return true;
+            }
+
+            // Cualquier fallo es definitivo: se muestra el motivo real y se corta.
+            // "Pago no encontrado" se trata igual que el resto porque también es
+            // un dato firme: el backend ya revisó el banco.
+            const notFound = result.error_code === 'PAYMENT_NOT_FOUND';
             await Gui.showPopup('ErrorPopup', {
-                title: _t('Pago no encontrado'),
-                body: (lastResult && lastResult.message) || _t('El pago aún no aparece en el banco.'),
+                title: notFound ? _t('Pago no encontrado') : _t('Error de Verificación Pabilo'),
+                body: result.message || _t('El pago no pudo ser verificado.'),
             });
             return false;
         },

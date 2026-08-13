@@ -32,7 +32,7 @@ class PosPaymentMethod(models.Model):
         whitelisted_fields = {'pabilo_user_bank_id'}
         return super()._is_write_forbidden(fields - whitelisted_fields)
 
-    def pabilo_verify_payment(self, reference, amount, user_bank_id=None):
+    def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None):
         """Verifica un pago contra la API de Pabilo. Llamado desde el POS.
 
         user_bank_id: cuenta elegida por el cajero en el POS (opcional). Si no
@@ -71,7 +71,12 @@ class PosPaymentMethod(models.Model):
                              'Sincronízalas desde los Ajustes.'),
             }
 
-        return self.env['pabilo.client'].verify_payment(user_bank, reference, amount)
+        # Nombre del origen: lo que manda el POS (caja + cajero) o, si no llegó,
+        # al menos el usuario, para que el pago sea rastreable desde Pabilo.
+        source = (source_name or '').strip() or self.env.user.name or ''
+
+        return self.env['pabilo.client'].verify_payment(
+            user_bank, reference, amount, source_name=source[:120])
 
     def pabilo_get_user_banks(self):
         """Cuentas Pabilo disponibles para elegir en el POS al cobrar."""
