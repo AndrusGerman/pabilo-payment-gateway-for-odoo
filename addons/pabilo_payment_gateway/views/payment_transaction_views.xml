@@ -26,7 +26,7 @@
                                     type="object"
                                     string="Verificar Pago (betaserio)"
                                     class="btn-primary"
-                                    attrs="{'invisible': [('pabilo_status', '=', 'verified')]}"
+                                    invisible="pabilo_status == 'verified'"
                                     icon="fa-check-circle"/>
                         </div>
                     </page>
@@ -43,13 +43,13 @@
                                     type="object"
                                     string="Crear Enlace de Pago"
                                     class="btn-primary"
-                                    attrs="{'invisible': [('pabilo_payment_link_id', '!=', False)]}"
+                                    invisible="pabilo_payment_link_id"
                                     icon="fa-link"/>
                             <button name="action_check_pabilo_payment_link"
                                     type="object"
                                     string="Consultar Estado"
                                     class="btn-secondary"
-                                    attrs="{'invisible': [('pabilo_payment_link_id', '=', False)]}"
+                                    invisible="not pabilo_payment_link_id"
                                     icon="fa-refresh"/>
                         </div>
                     </page>

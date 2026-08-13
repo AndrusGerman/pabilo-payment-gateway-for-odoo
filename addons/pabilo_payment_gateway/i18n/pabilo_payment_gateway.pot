@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0-20250909\n"
+"Project-Id-Version: Odoo Server 17.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-13 01:18+0000\n"
-"PO-Revision-Date: 2026-08-13 01:18+0000\n"
+"POT-Creation-Date: 2026-08-13 01:49+0000\n"
+"PO-Revision-Date: 2026-08-13 01:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -141,13 +141,13 @@ msgid "Compañía"
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model:ir.model,name:pabilo_payment_gateway.model_res_config_settings
-msgid "Config Settings"
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Conexión con Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
-msgid "Configura la llave para usar la API de Pabilo."
+#: model:ir.model,name:pabilo_payment_gateway.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -259,6 +259,11 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_user_bank
 msgid "Cuentas Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Cuentas bancarias"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -582,12 +587,6 @@ msgid ""
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard____last_update
-#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_uid
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_uid
 msgid "Last Updated by"
@@ -597,6 +596,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_date
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Llave de tu cuenta de Pabilo. Se usa para verificar los pagos."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -684,12 +688,8 @@ msgstr ""
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_provider__code__pabilo
 #: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_root
 #: model:payment.provider,name:pabilo_payment_gateway.payment_provider_pabilo
-msgid "Pabilo"
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
-msgid "Pabilo API Configuration"
+msgid "Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -701,11 +701,6 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_provider__pabilo_api_key
 msgid "Pabilo API Key (appKey)"
-msgstr ""
-
-#. module: pabilo_payment_gateway
-#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
-msgid "Pabilo Payment"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -931,6 +926,13 @@ msgid "Todavía no hay cuentas sincronizadas"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid ""
+"Trae desde Pabilo las cuentas donde se verificarán los pagos. Son de solo "
+"lectura en Odoo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__transfer
 msgid "Transferencia Bancaria"
 msgstr ""
@@ -995,7 +997,7 @@ msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model_terms:payment.provider,done_msg:pabilo_payment_gateway.payment_provider_pabilo
-msgid "Your payment has been successfully processed. Thank you!"
+msgid "Your payment has been successfully processed."
 msgstr ""
 
 #. module: pabilo_payment_gateway

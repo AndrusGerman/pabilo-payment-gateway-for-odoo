@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="payment.payment_provider_form"/>
         <field name="arch" type="xml">
             <group name="provider_credentials" position="inside">
-                <group attrs="{'invisible': [('code', '!=', 'pabilo')]}">
+                <group invisible="code != 'pabilo'">
                     <field name="pabilo_api_key" password="True" 
                            string="API Key (appKey)"
                            placeholder="Tu API Key de Pabilo"/>

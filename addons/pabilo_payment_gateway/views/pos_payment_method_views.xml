@@ -7,7 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='use_payment_terminal']" position="after">
                 <field name="pabilo_user_bank_id"
-                       attrs="{'invisible': [('use_payment_terminal', '!=', 'pabilo')], 'required': [('use_payment_terminal', '=', 'pabilo')]}"
+                       invisible="use_payment_terminal != 'pabilo'"
+                       required="use_payment_terminal == 'pabilo'"
                        options="{'no_create': True}"
                        string="Cuenta Bancaria Pabilo"/>
             </xpath>
