@@ -13,8 +13,8 @@ class ResConfigSettings(models.TransientModel):
     pabilo_api_url = fields.Char(
         string='URL Base de Pabilo',
         config_parameter='pabilo.api_url',
-        help="URL del backend de Pabilo. Para un backend local con Odoo en Docker: "
-             "http://host.docker.internal:3349 (127.0.0.1 apuntaría al propio contenedor)."
+        help="URL del backend de Pabilo. En producción, https://api.pabilo.app; "
+             "solo hace falta cambiarla si Pabilo te indica otro servidor."
     )
 
     pabilo_webhook_secret = fields.Char(

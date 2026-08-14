@@ -23,7 +23,7 @@
                                     <div class="mt16">
                                         <label for="pabilo_api_url" string="URL Base"/>
                                         <div class="text-muted">
-                                            Backend de Pabilo. Local con Odoo en Docker: http://host.docker.internal:3349
+                                            Backend de Pabilo. En producción: https://api.pabilo.app
                                         </div>
                                         <field name="pabilo_api_url" class="o_light_label"/>
                                     </div>

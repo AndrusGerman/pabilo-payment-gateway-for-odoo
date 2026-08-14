@@ -23,8 +23,8 @@ odoo -u pabilo_payment_gateway -d <db> --stop-after-init
 3. Añade el método de pago al punto de venta.
 
 La URL base del backend se guarda en el parámetro de sistema `pabilo.api_url`
-(por defecto `https://api.pabilo.app`). Para un backend local con Odoo en Docker
-usa `http://host.docker.internal:3349`; `127.0.0.1` apuntaría al propio contenedor.
+(por defecto `https://api.pabilo.app`). Solo hace falta cambiarla si Pabilo
+indica otro servidor.
 
 ## Arquitectura
 

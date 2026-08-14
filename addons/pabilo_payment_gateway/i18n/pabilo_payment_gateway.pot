@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0-20250909\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 14:56+0000\n"
-"PO-Revision-Date: 2026-08-14 14:56+0000\n"
+"POT-Creation-Date: 2026-08-14 22:27+0000\n"
+"PO-Revision-Date: 2026-08-14 22:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -79,9 +79,7 @@ msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
-msgid ""
-"Backend de Pabilo. Local con Odoo en Docker: "
-"http://host.docker.internal:3349"
+msgid "Backend de Pabilo. En producción: https://api.pabilo.app"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -964,22 +962,6 @@ msgid "Soporta Enlaces de Pago"
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model_terms:payment.provider,auth_msg:pabilo_payment_gateway.payment_provider_pabilo
-msgid "Su pago ha sido autorizado."
-msgstr ""
-
-#. module: pabilo_payment_gateway
-#: model_terms:payment.provider,cancel_msg:pabilo_payment_gateway.payment_provider_pabilo
-msgid "Su pago ha sido cancelado."
-msgstr ""
-
-#. module: pabilo_payment_gateway
-#: model_terms:payment.provider,pending_msg:pabilo_payment_gateway.payment_provider_pabilo
-msgid ""
-"Su pago ha sido procesado con éxito pero está en espera de su aprobación."
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__bank_test
 msgid "Test"
 msgstr ""
@@ -1021,11 +1003,6 @@ msgid "Tu API Key de Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model_terms:payment.provider,done_msg:pabilo_payment_gateway.payment_provider_pabilo
-msgid "Tu pago se ha procesado con éxito. ¡Gracias!"
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
 msgid "URL Base"
 msgstr ""
@@ -1043,8 +1020,8 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,help:pabilo_payment_gateway.field_res_config_settings__pabilo_api_url
 msgid ""
-"URL del backend de Pabilo. Para un backend local con Odoo en Docker: "
-"http://host.docker.internal:3349 (127.0.0.1 apuntaría al propio contenedor)."
+"URL del backend de Pabilo. En producción, https://api.pabilo.app; solo hace "
+"falta cambiarla si Pabilo te indica otro servidor."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1060,6 +1037,27 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
 msgid "Verificar Pago (betaserio)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,auth_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been authorized."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,cancel_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been cancelled."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,pending_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid ""
+"Your payment has been successfully processed but is waiting for approval."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:payment.provider,done_msg:pabilo_payment_gateway.payment_provider_pabilo
+msgid "Your payment has been successfully processed. Thank you!"
 msgstr ""
 
 #. module: pabilo_payment_gateway
