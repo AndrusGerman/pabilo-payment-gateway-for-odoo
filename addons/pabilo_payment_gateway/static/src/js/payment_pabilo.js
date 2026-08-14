@@ -21,6 +21,15 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             this._pabilo_cancelled = false;
         },
 
+        // Fecha de hoy en la zona del navegador, en YYYY-MM-DD. toISOString()
+        // daria UTC, que de noche cae en el dia siguiente y buscaria mal.
+        _today: function () {
+            const d = new Date();
+            const mes = String(d.getMonth() + 1).padStart(2, '0');
+            const dia = String(d.getDate()).padStart(2, '0');
+            return `${d.getFullYear()}-${mes}-${dia}`;
+        },
+
         // Identifica la caja y el cajero que cobran, para poder rastrear el pago
         // desde Pabilo cuando varias cajas comparten la misma cuenta bancaria.
         _source_name: function () {
@@ -30,7 +39,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return parts.join(' - ').slice(0, 120);
         },
 
-        _verify: function (reference, amount, bankId) {
+        _verify: function (reference, amount, bankId, fechaPago) {
             // El timeout del RPC debe superar el del servidor (110 s) para que
             // gane el mensaje real de Pabilo y no un error de red genérico.
             return rpc.query(
@@ -43,6 +52,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                         amount,
                         bankId || null,
                         this._source_name(),
+                        fechaPago || null,
                     ],
                 },
                 { shadow: true, timeout: VERIFY_TIMEOUT_MS }
@@ -130,6 +140,20 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 return false;
             }
 
+            // Fecha del pago, ya rellenada con hoy: el caso normal es confirmar
+            // sin escribir nada. Solo se toca para un pago de otro dia.
+            const hoy = this._today();
+            const fechaRes = await Gui.showPopup('TextInputPopup', {
+                title: _t('Fecha del pago'),
+                body: _t('Formato AAAA-MM-DD. Dejar como está si el pago es de hoy.'),
+                startingValue: hoy,
+                placeholder: hoy,
+            });
+            if (this._pabilo_cancelled || !fechaRes.confirmed) {
+                return false;
+            }
+            const fechaPago = (fechaRes.payload || '').trim() || hoy;
+
             // 'waitingCard' es lo que pinta el spinner de "buscando" en la
             // línea de pago. La llamada es única y puede tardar hasta 110 s, que
             // es lo que el banco puede demorar en responder.
@@ -137,7 +161,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
 
             let result = null;
             try {
-                result = await this._verify(reference, amount, bankId);
+                result = await this._verify(reference, amount, bankId, fechaPago);
             } catch (error) {
                 await Gui.showPopup('ErrorPopup', {
                     title: _t('Sin respuesta de Pabilo'),
