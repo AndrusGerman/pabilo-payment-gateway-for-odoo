@@ -30,6 +30,12 @@ Una cuenta en https://pabilo.app con su API Key (appKey).
     'category': 'Accounting/Payment Providers',
     'author': 'AndrusCodex',
     'maintainer': 'AndrusCodex',
+    # Se acredita el aporte real de cada quien. La autoria del codigo la lleva el
+    # historial de commits; esta clave la muestra el Apps Store en la ficha.
+    'contributors': [
+        'AndrusGerman <andrusdiazaleman@gmail.com>',  # autor y mantenedor
+        'dasilvacsv <dasilva.csv@gmail.com>',  # revision de codigo y QA
+    ],
     'website': 'https://pabilo.app',
     # TODO antes de publicar: correo de soporte real que se mostrará en la ficha.
     # 'support': 'soporte@pabilo.app',
