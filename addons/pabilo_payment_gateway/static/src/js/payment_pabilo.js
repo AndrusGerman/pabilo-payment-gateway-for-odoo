@@ -5,6 +5,7 @@ import { PaymentInterface } from "@point_of_sale/app/payment/payment_interface";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { NumberPopup } from "@point_of_sale/app/utils/input_popups/number_popup";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
+import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 
 // No se reintenta ningun error. "Pago no encontrado" parecia el caso a repetir,
 // pero el backend ya consulto el banco antes de responderlo: es un dato firme,
@@ -30,6 +31,15 @@ export class PaymentPabilo extends PaymentInterface {
         return this.env.services.orm;
     }
 
+    // Fecha de hoy en la zona del navegador, en YYYY-MM-DD. toISOString() daria
+    // UTC, que de noche cae en el dia siguiente y buscaria mal.
+    get today() {
+        const d = new Date();
+        const mes = String(d.getMonth() + 1).padStart(2, "0");
+        const dia = String(d.getDate()).padStart(2, "0");
+        return `${d.getFullYear()}-${mes}-${dia}`;
+    }
+
     // Identifica la caja y el cajero que cobran, para poder rastrear el pago
     // desde Pabilo cuando varias cajas comparten la misma cuenta bancaria.
     get sourceName() {
@@ -39,14 +49,21 @@ export class PaymentPabilo extends PaymentInterface {
         return parts.join(" - ").slice(0, 120);
     }
 
-    _verify(reference, amount, bankId) {
+    _verify(reference, amount, bankId, fechaPago) {
         // El timeout del ORM debe superar el del servidor (110 s) para que gane
         // el mensaje real de Pabilo y no un error de red generico.
         return this.orm.silent
             .call(
                 "pos.payment.method",
                 "pabilo_verify_payment",
-                [[this.payment_method.id], reference, amount, bankId || null, this.sourceName],
+                [
+                    [this.payment_method.id],
+                    reference,
+                    amount,
+                    bankId || null,
+                    this.sourceName,
+                    fechaPago || null,
+                ],
                 {},
                 { timeout: VERIFY_TIMEOUT_MS }
             );
@@ -128,6 +145,20 @@ export class PaymentPabilo extends PaymentInterface {
             return false;
         }
 
+        // Fecha del pago, ya rellenada con hoy: el caso normal es confirmar sin
+        // escribir nada. Solo se toca para un pago de otro dia.
+        const hoy = this.today;
+        const fechaRes = await this.popup.add(TextInputPopup, {
+            title: _t("Fecha del pago"),
+            body: _t("Formato AAAA-MM-DD. Dejar como está si el pago es de hoy."),
+            startingValue: hoy,
+            placeholder: hoy,
+        });
+        if (this._pabilo_cancelled || !fechaRes.confirmed) {
+            return false;
+        }
+        const fechaPago = (fechaRes.payload || "").trim() || hoy;
+
         // "waitingCard" es lo que pinta el spinner de "buscando" en la linea de
         // pago. La llamada es unica y puede tardar hasta 110 s, que es lo que el
         // banco puede demorar en responder.
@@ -135,7 +166,7 @@ export class PaymentPabilo extends PaymentInterface {
 
         let result = null;
         try {
-            result = await this._verify(reference, amount, bankId);
+            result = await this._verify(reference, amount, bankId, fechaPago);
         } catch (error) {
             await this.popup.add(ErrorPopup, {
                 title: _t("Sin respuesta de Pabilo"),
@@ -167,7 +198,12 @@ export class PaymentPabilo extends PaymentInterface {
             line.pabilo_is_new = result.is_new;
             line.set_payment_status("done");
             line.set_receipt_info(
-                _t("Pabilo ref: %s\nCuenta: %s\n", reference, bankLabel || "-")
+                _t(
+                    "Pabilo ref: %s\nCuenta: %s\nFecha: %s\n",
+                    reference,
+                    bankLabel || "-",
+                    fechaPago
+                )
             );
             return true;
         }

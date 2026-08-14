@@ -95,7 +95,7 @@ class PabiloClient(models.AbstractModel):
 
     @api.model
     def verify_payment(self, user_bank, reference, amount, movement_type='GENERIC',
-                       provider=None, source_name=''):
+                       provider=None, source_name='', fecha_pago=''):
         """Verifica un pago vía betaserio.
 
         Devuelve un dict normalizado (nunca lanza excepciones de dominio):
@@ -118,6 +118,11 @@ class PabiloClient(models.AbstractModel):
         # cuenta, sin esto los pagos son indistinguibles en Pabilo.
         if source_name:
             payload['source_name'] = source_name
+        # Acota la busqueda al dia del pago. El backend la interpreta en hora de
+        # Caracas y abre una ventana que incluye el dia anterior, asi que un pago
+        # de anoche verificado hoy sigue apareciendo.
+        if fecha_pago:
+            payload['fecha_pago'] = fecha_pago
 
         # Timeout largo y una sola llamada: la consulta al banco puede tardar,
         # pero la respuesta es firme, así que reintentar no aporta nada.

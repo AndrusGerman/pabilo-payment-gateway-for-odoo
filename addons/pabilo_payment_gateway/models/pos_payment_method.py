@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
@@ -32,7 +33,8 @@ class PosPaymentMethod(models.Model):
         whitelisted_fields = {'pabilo_user_bank_id'}
         return super()._is_write_forbidden(fields - whitelisted_fields)
 
-    def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None):
+    def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None,
+                              fecha_pago=None):
         """Verifica un pago contra la API de Pabilo. Llamado desde el POS.
 
         user_bank_id: cuenta elegida por el cajero en el POS (opcional). Si no
@@ -75,8 +77,25 @@ class PosPaymentMethod(models.Model):
         # al menos el usuario, para que el pago sea rastreable desde Pabilo.
         source = (source_name or '').strip() or self.env.user.name or ''
 
+        # Por defecto el dia de hoy en la zona del usuario, que es el caso normal
+        # en una caja. Se valida aqui para no gastar una llamada a la API en un
+        # 400 por formato.
+        fecha = (fecha_pago or '').strip()
+        if not fecha:
+            fecha = fields.Date.to_string(fields.Date.context_today(self))
+        else:
+            try:
+                datetime.strptime(fecha, '%Y-%m-%d')
+            except ValueError:
+                return {
+                    'verified': False, 'status': 'failed', 'payment_id': '',
+                    'is_new': False, 'credit_cost': 0.0,
+                    'error_code': 'INVALID_DATE',
+                    'message': _('La fecha debe tener el formato AAAA-MM-DD.'),
+                }
+
         return self.env['pabilo.client'].verify_payment(
-            user_bank, reference, amount, source_name=source[:120])
+            user_bank, reference, amount, source_name=source[:120], fecha_pago=fecha)
 
     def pabilo_get_user_banks(self):
         """Cuentas Pabilo disponibles para elegir en el POS al cobrar."""
