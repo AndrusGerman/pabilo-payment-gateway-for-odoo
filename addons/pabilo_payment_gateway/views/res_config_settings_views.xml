@@ -30,8 +30,9 @@
                                     <div class="mt16">
                                         <label for="pabilo_webhook_secret" string="Secreto del Webhook"/>
                                         <div class="text-muted">
-                                            Debe coincidir con WEBHOOK_SIGN_SECRET del backend. Sin él,
-                                            los webhooks de enlaces de pago se rechazan.
+                                            Se obtiene solo al pulsar Sincronizar; es propio de tu
+                                            cuenta de Pabilo. No hace falta escribirlo. Sin él, los
+                                            webhooks de enlaces de pago se rechazan.
                                         </div>
                                         <field name="pabilo_webhook_secret" class="o_light_label" widget="password"/>
                                     </div>

@@ -26,8 +26,10 @@ class PabiloWebhookController(http.Controller):
     def _verify_signature(self, raw_body):
         """Comprueba la firma HMAC del webhook.
 
-        Devuelve (ok, motivo). El secreto se configura en Ajustes → Pabilo y
-        debe coincidir con WEBHOOK_SIGN_SECRET del backend.
+        Devuelve (ok, motivo). El secreto es propio de esta cuenta de Pabilo y
+        lo trae la sincronización desde GET /me/webhook-secret; queda en el
+        parámetro de sistema pabilo.webhook_secret. No es global: con uno
+        compartido, cualquier comercio podría firmar webhooks a nombre de otro.
         """
         secret = request.env['ir.config_parameter'].sudo().get_param('pabilo.webhook_secret', '')
         if not secret:
