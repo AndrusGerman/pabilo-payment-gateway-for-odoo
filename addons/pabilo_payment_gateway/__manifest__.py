@@ -1,6 +1,6 @@
 {
     'name': 'Pabilo Payment Gateway for Odoo',
-    'version': '17.0.2.0.0',
+    'version': '17.0.2.0.1',
     'summary': 'Verifica pagos móviles, transferencias y Binance en el POS con Pabilo',
     'description': """
 Pabilo Payment Gateway
@@ -37,8 +37,7 @@ Una cuenta en https://pabilo.app con su API Key (appKey).
         'dasilvacsv <dasilva.csv@gmail.com>',  # revision de codigo y QA
     ],
     'website': 'https://pabilo.app',
-    # TODO antes de publicar: correo de soporte real que se mostrará en la ficha.
-    # 'support': 'soporte@pabilo.app',
+    'support': 'contacto@pabilo.app',
     'license': 'LGPL-3',
     'depends': ['account', 'payment', 'point_of_sale'],
     'data': [

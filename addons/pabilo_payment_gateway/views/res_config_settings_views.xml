@@ -18,7 +18,7 @@
                             <field name="pabilo_api_key" widget="password"/>
                         </setting>
                         <setting string="URL Base"
-                                 help="Backend de Pabilo. Local con Odoo en Docker: http://host.docker.internal:3349">
+                                 help="Backend de Pabilo. En producción: https://api.pabilo.app">
                             <field name="pabilo_api_url"/>
                         </setting>
                         <setting string="Secreto del Webhook"

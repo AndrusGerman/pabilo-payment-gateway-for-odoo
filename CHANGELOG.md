@@ -4,6 +4,21 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.0.1 / 17.0.2.0.1 — textos de cara al cliente
+
+Sin cambios de comportamiento: solo texto y metadatos.
+
+- **Correo de soporte en el manifest** (`contacto@pabilo.app`). Es lo que muestra
+  el Apps Store en la ficha y lo que pide el formulario de publicación.
+- **La ayuda de la URL base deja de hablar de Docker.** El texto de Ajustes
+  explicaba cómo apuntar a un backend local (`host.docker.internal:3349`), que no
+  le sirve a nadie que instale el módulo: ahora dice que por defecto es
+  `https://api.pabilo.app` y cuándo tocarla. Igual en el README del addon.
+- **`.pot` regenerado en las dos series**, porque los dos mensajes anteriores son
+  traducibles. En `16.0`, además, los cuatro mensajes de estado heredados de
+  `payment` vuelven a su inglés de origen: aquel export había salido de una base
+  con español instalado y se llevó las traducciones al template.
+
 ## 16.0.2.0.0 / 17.0.2.0.0 — primera versión publicable
 
 Primera versión apta para el Apps Store. Antes de esto el flujo del POS no podía
