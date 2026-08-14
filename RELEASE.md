@@ -9,8 +9,8 @@ cambios en [CHANGELOG.md](CHANGELOG.md).
 **No hay `main`.** Una rama por serie, nombrada igual que la versión de Odoo:
 
 ```
-16.0     ← rama por defecto mientras producción siga en Odoo 16
-17.0
+16.0     ← rama de corrección: los arreglos entran aquí primero
+17.0     ← rama por defecto en GitHub: la serie más nueva
 ```
 
 Es la convención de `odoo/odoo` y de la OCA, y aquí no es dogma: el código es
@@ -18,10 +18,15 @@ específico de la serie. El JS del POS de 16 y 17 no comparte una línea y la vi
 de ajustes tampoco, así que un `main` sería o un duplicado de una serie, o una
 fusión que no arranca en ninguna.
 
-**Se corrige en la rama por defecto y se lleva a la otra con `cherry-pick`.** Hoy
-eso significa 16.0 → 17.0, porque 16 es lo que está en producción y donde se
-valida contra el uso real. Cuando producción migre a 17, se cambia la rama por
-defecto y se invierte el sentido del port.
+Son **dos papeles distintos y no tienen por qué coincidir**:
+
+- **Rama por defecto (`17.0`).** Lo que ve quien llega al repositorio y la base de
+  los PR. Es la serie más nueva, que es lo que va a instalar quien empiece hoy.
+  Cambia solo cuando se publique una serie posterior.
+- **Rama de corrección (`16.0`).** Donde entran los arreglos primero, porque 16 es
+  lo que está en producción y donde se valida contra el uso real. De ahí se llevan
+  a `17.0` con `cherry-pick`. Cuando producción migre a 17, se invierte el sentido
+  del port y `16.0` pasa a mantenimiento.
 
 Lo que nunca se cherry-pickea sin revisar: `static/src/js/*`,
 `views/res_config_settings_views.xml` y cualquier vista con condiciones de
