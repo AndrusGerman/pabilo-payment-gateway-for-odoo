@@ -34,8 +34,9 @@
           <div style="width:38px;height:38px;border-radius:19px;background:#F07C29;color:#fff;text-align:center;line-height:38px;font-weight:700;">2</div>
         </td>
         <td style="vertical-align:top;padding:12px 0;color:#4a525c;">
-          En el POS el cajero elige el método <b>Pabilo</b> y teclea los 6 últimos
-          dígitos de la referencia en un teclado numérico.
+          En el POS el cajero elige el método <b>Pabilo</b>, teclea los 6 últimos
+          dígitos de la referencia en un teclado numérico y confirma la fecha,
+          que ya viene rellenada con la de hoy.
         </td>
       </tr>
       <tr>
@@ -44,8 +45,9 @@
         </td>
         <td style="vertical-align:top;padding:12px 0;color:#4a525c;">
           Odoo consulta el banco a través de Pabilo y confirma la línea de pago.
-          Si el pago aún no ha llegado, <b>reintenta solo</b> durante 30 segundos
-          en vez de fallar.
+          Si algo no cuadra, el cajero ve <b>el motivo exacto</b> —monto que no
+          coincide, referencia ya usada, pago no encontrado— y no una espera
+          indefinida.
         </td>
       </tr>
     </table>
@@ -78,8 +80,8 @@
       <tr>
         <td style="vertical-align:top;padding:10px 24px 10px 0;">
           <b style="color:#1c2026;">Errores en claro</b><br/>
-          «El monto no coincide», «el pago aún no aparece en el banco»: el cajero
-          ve el motivo real, no un error genérico.
+          «El monto no coincide», «pago no encontrado», «referencia ya usada»:
+          el cajero ve el motivo real, no un error genérico.
         </td>
         <td style="vertical-align:top;padding:10px 0;">
           <b style="color:#1c2026;">Cuentas sincronizadas</b><br/>

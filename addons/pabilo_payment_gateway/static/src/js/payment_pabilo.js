@@ -85,7 +85,8 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
          * Se llama cuando el cajero pulsa "Enviar" en una línea de pago Pabilo.
          * 1) Si hay varias cuentas, el cajero elige a cuál llegó el pago.
          * 2) Pide los últimos 6 dígitos de la referencia (el backend matchea por sufijo).
-         * 3) Verifica con reintentos automáticos contra la cuenta elegida.
+         * 3) Pide la fecha del pago, ya rellenada con hoy.
+         * 4) Verifica una sola vez: la respuesta del backend es firme.
          */
         send_payment_request: async function (cid) {
             this._super(...arguments);
