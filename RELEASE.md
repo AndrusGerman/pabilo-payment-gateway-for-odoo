@@ -1,7 +1,45 @@
 # Publicación — pabilo_payment_gateway
 
 Guía para subir el módulo al Odoo Apps Store. Las diferencias entre series y el
-procedimiento de pruebas están en [VERSIONES.md](VERSIONES.md).
+procedimiento de pruebas están en [VERSIONES.md](VERSIONES.md); el historial de
+cambios en [CHANGELOG.md](CHANGELOG.md).
+
+## Modelo de ramas
+
+**No hay `main`.** Una rama por serie, nombrada igual que la versión de Odoo:
+
+```
+16.0     ← rama por defecto mientras producción siga en Odoo 16
+17.0
+```
+
+Es la convención de `odoo/odoo` y de la OCA, y aquí no es dogma: el código es
+específico de la serie. El JS del POS de 16 y 17 no comparte una línea y la vista
+de ajustes tampoco, así que un `main` sería o un duplicado de una serie, o una
+fusión que no arranca en ninguna.
+
+**Se corrige en la rama por defecto y se lleva a la otra con `cherry-pick`.** Hoy
+eso significa 16.0 → 17.0, porque 16 es lo que está en producción y donde se
+valida contra el uso real. Cuando producción migre a 17, se cambia la rama por
+defecto y se invierte el sentido del port.
+
+Lo que nunca se cherry-pickea sin revisar: `static/src/js/*`,
+`views/res_config_settings_views.xml` y cualquier vista con condiciones de
+visibilidad.
+
+## Numeración
+
+El manifest de Odoo exige el prefijo de serie: `<serie>.<mayor>.<menor>.<parche>`.
+Sin él, el Apps Store no puede comparar versiones.
+
+```
+16.0.2.0.0    17.0.2.0.0    ← actual
+16.0.2.1.0    17.0.2.1.0    ← funcionalidad nueva
+16.0.2.1.1    17.0.2.1.1    ← arreglo
+```
+
+Los **tres últimos números van iguales en las dos ramas**: así `2.1.0` significa
+lo mismo en ambas y se ve de un vistazo si están parejas.
 
 ## Paquetes
 

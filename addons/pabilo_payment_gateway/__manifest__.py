@@ -8,16 +8,16 @@ Pabilo Payment Gateway
 
 Verificación automática de pagos venezolanos dentro de Odoo.
 
-En el Punto de Venta el cajero teclea los últimos 6 dígitos de la referencia y
-Odoo confirma el cobro contra el banco en segundos, sin salir de la pantalla de
-pago. Si el pago todavía no ha llegado al banco, reintenta solo durante 30
-segundos en lugar de fallar.
+En el Punto de Venta el cajero teclea los últimos 6 dígitos de la referencia,
+confirma la fecha (ya rellenada con hoy) y Odoo verifica el cobro contra el
+banco sin salir de la pantalla de pago.
 
 Funcionalidades
 ---------------
 * Método de pago para el POS que verifica contra la API de Pabilo.
 * Pago móvil, transferencias y Binance con el mismo método.
 * Selección de la cuenta bancaria destino cuando hay varias.
+* Fecha del pago prellenada con hoy, para no teclearla en el caso normal.
 * Rechazo de referencias ya usadas, para no cobrar dos veces el mismo pago.
 * Referencia e ID de Pabilo guardados en el pago del POS, para auditoría.
 * Verificación manual y enlaces de pago desde las transacciones de pago.

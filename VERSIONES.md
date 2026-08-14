@@ -8,7 +8,10 @@ un único paquete que soporte varias.
 | :--- | :--- | :--- | :--- |
 | `16.0` | 16.0 | `16.0.2.0.0` | `odoo:16.0` |
 | `17.0` | 17.0 | `17.0.2.0.0` | `odoo:17.0` |
-| `main` | — | — | Queda en el commit previo a este trabajo |
+
+No hay rama `main`: el código es específico de la serie, así que una rama común
+sería un duplicado o una fusión que no arranca. El modelo completo está en
+[RELEASE.md](RELEASE.md).
 
 `docker-compose.yml` está fijado a la imagen que corresponde en cada rama, así que
 basta con hacer checkout para tener el entorno correcto.
@@ -316,7 +319,7 @@ Requiere el backend de Pabilo. Las credenciales y los IDs de cuentas están en
    (script no versionado; imprime los 6 dígitos a teclear).
 6. En el POS: vender por Bs. 150, método Pabilo, teclear los 6 dígitos.
 7. Casos a demostrar: duplicado (misma referencia dos veces → *Pago ya
-   registrado*), no encontrado (`999999` → reintenta ~30 s), monto que no
+   registrado*), no encontrado (`999999` → *Pago no encontrado*, sin reintentar), monto que no
    coincide (`PAYMENT_AMOUNT_NOT_VALID`).
 8. Tras validar la orden, comprobar la trazabilidad:
    ```powershell
@@ -344,7 +347,7 @@ Ejecutado sobre `odoo:16.0` y `odoo:17.0` reales:
 | Exportación de traducciones (170 mensajes) | ✅ | ✅ |
 | Desinstalación sin residuos | ✅ | ✅ |
 
-**No probado en navegador.** El flujo del POS (popups, reintentos, cancelación)
+**No probado en navegador.** El flujo del POS (popups, fecha, cancelación)
 está verificado a nivel de contrato —módulos, rutas de import, props de los
 popups y firma de los métodos, todo contra el código de cada imagen— pero no se
 ha abierto una sesión de POS en 17.0. Es lo que falta antes de publicar esa rama.
