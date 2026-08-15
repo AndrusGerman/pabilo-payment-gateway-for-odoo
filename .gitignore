@@ -30,5 +30,5 @@ Thumbs.db
 *.local.ps1
 
 # Scripts temporales de prueba que se montan en el contenedor
-/addons/_t_*.py
-/addons/_probe*.py
+/_t_*.py
+/_probe*.py

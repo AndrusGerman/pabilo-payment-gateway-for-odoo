@@ -7,7 +7,7 @@
 
 Verificación automática de pagos venezolanos dentro del Punto de Venta de Odoo.
 
-![Pabilo Payment Gateway](addons/pabilo_payment_gateway/static/description/banner.png)
+![Pabilo Payment Gateway](pabilo_payment_gateway/static/description/banner.png)
 
 El cajero teclea los **últimos 6 dígitos** de la referencia, confirma la fecha
 —ya rellenada con hoy— y Odoo verifica el cobro contra el banco a través de la
@@ -71,7 +71,7 @@ La URL base del backend vive en el parámetro de sistema `pabilo.api_url`
 
 | Documento | Contenido |
 | :--- | :--- |
-| [Manual del addon](addons/pabilo_payment_gateway/README.md) | Arquitectura, contrato con el backend, webhook y limitaciones conocidas. |
+| [Manual del addon](pabilo_payment_gateway/README.md) | Arquitectura, contrato con el backend, webhook y limitaciones conocidas. |
 | [VERSIONES.md](VERSIONES.md) | Diferencias entre series y procedimiento de pruebas. |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios. |
 | [RELEASE.md](RELEASE.md) | Modelo de ramas, numeración y publicación en el Apps Store. |

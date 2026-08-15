@@ -158,8 +158,8 @@ Esperado: `installed` y la versión de la rama (`16.0.2.0.0` / `17.0.2.0.0`).
 
 ### Suite de comprobaciones funcionales
 
-Guardar como `addons/_t.py` (la carpeta `addons/` está montada en el contenedor)
-y ejecutar:
+Guardar como `_t.py` en la raíz del repo (la raíz se monta como
+`/mnt/extra-addons` en el contenedor) y ejecutar:
 
 ```powershell
 docker compose run --rm -T --entrypoint bash web `
