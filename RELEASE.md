@@ -54,10 +54,10 @@ scripts de prueba ni secretos:
 ```bash
 mkdir -p dist
 for b in 16.0 17.0; do
-  v=$(git show $b:addons/pabilo_payment_gateway/__manifest__.py \
+  v=$(git show $b:pabilo_payment_gateway/__manifest__.py \
       | python -c "import ast,sys; print(ast.literal_eval(sys.stdin.read())['version'])")
   git archive --format=zip --prefix=pabilo_payment_gateway/ \
-      "$b:addons/pabilo_payment_gateway" -o "dist/pabilo_payment_gateway-${v}.zip"
+      "$b:pabilo_payment_gateway" -o "dist/pabilo_payment_gateway-${v}.zip"
 done
 ```
 
