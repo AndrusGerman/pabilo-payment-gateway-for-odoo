@@ -4,6 +4,18 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.1.0 / 17.0.2.1.0 — sin publicar
+
+Preparación para el Apps Store. Todavía no hay etiqueta ni release: faltan las
+capturas de la ficha, pasarla a inglés y operar un cobro en 17 desde el navegador.
+
+- **Módulo de pago: 15 USD y licencia OPL-1.** `price` y `currency` en el
+  manifest. La licencia deja de ser LGPL-3 y pasa a la propietaria de Odoo, que
+  es la que permite vender sin que el comprador pueda redistribuirlo. Las
+  versiones `2.0.0` y `2.0.1` siguen siendo LGPL-3: el cambio rige de aquí en
+  adelante. El repositorio pasa a privado, porque el código a la vista hace
+  irrelevante cualquier licencia.
+
 ## 16.0.2.0.1 / 17.0.2.0.1 — textos de cara al cliente
 
 Sin cambios de comportamiento: solo texto y metadatos.

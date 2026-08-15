@@ -2,8 +2,8 @@
 
 [![Odoo 16.0](https://img.shields.io/badge/Odoo-16.0-875A7B?logo=odoo&logoColor=white)](https://github.com/AndrusGerman/pabilo-payment-gateway-for-odoo/tree/16.0)
 [![Odoo 17.0](https://img.shields.io/badge/Odoo-17.0-875A7B?logo=odoo&logoColor=white)](https://github.com/AndrusGerman/pabilo-payment-gateway-for-odoo/tree/17.0)
-[![Licencia: LGPL-3](https://img.shields.io/badge/Licencia-LGPL--3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-2.0.0-success.svg)](CHANGELOG.md)
+![Licencia: OPL-1](https://img.shields.io/badge/Licencia-OPL--1-orange.svg)
+[![Versión](https://img.shields.io/badge/versi%C3%B3n-2.0.1-success.svg)](CHANGELOG.md)
 
 Verificación automática de pagos venezolanos dentro del Punto de Venta de Odoo.
 
@@ -87,5 +87,6 @@ Los créditos completos están en [AUTHORS.md](AUTHORS.md).
 
 ## Licencia
 
-[LGPL-3](https://www.gnu.org/licenses/lgpl-3.0). Requiere una cuenta en
+**OPL-1** (Odoo Proprietary License v1.0), la licencia de Odoo para módulos de
+pago. El módulo se vende en el Apps Store a **15 USD**. Requiere una cuenta en
 [pabilo.app](https://pabilo.app) con su API Key.

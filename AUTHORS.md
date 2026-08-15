@@ -27,5 +27,6 @@ Las contribuciones se acreditan por el trabajo hecho:
 
 ## Licencia
 
-Al contribuir aceptas que tu aporte se publique bajo
-[LGPL-3](https://www.gnu.org/licenses/lgpl-3.0), la licencia del módulo.
+Al contribuir aceptas que tu aporte se publique bajo **OPL-1** (Odoo Proprietary
+License v1.0), la licencia del módulo. Las versiones `2.0.0` y `2.0.1`, que se
+publicaron bajo LGPL-3, siguen siendo LGPL-3: el cambio rige de ahí en adelante.
