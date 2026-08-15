@@ -88,5 +88,5 @@ Los créditos completos están en [AUTHORS.md](AUTHORS.md).
 ## Licencia
 
 **OPL-1** (Odoo Proprietary License v1.0), la licencia de Odoo para módulos de
-pago. El módulo se vende en el Apps Store a **15 USD**. Requiere una cuenta en
+pago. El módulo se vende en el Apps Store a **25 USD**. Requiere una cuenta en
 [pabilo.app](https://pabilo.app) con su API Key.
