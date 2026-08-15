@@ -108,4 +108,4 @@ en lugar de procesar el webhook.
 
 ## Licencia
 
-LGPL-3
+OPL-1 (Odoo Proprietary License v1.0)
