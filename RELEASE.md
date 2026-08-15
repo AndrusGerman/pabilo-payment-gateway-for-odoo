@@ -63,8 +63,8 @@ done
 
 | Paquete | Rama | Etiqueta |
 | :--- | :--- | :--- |
-| `pabilo_payment_gateway-16.0.2.0.0.zip` | `16.0` | `v16.0.2.0.0` |
-| `pabilo_payment_gateway-17.0.2.0.0.zip` | `17.0` | `v17.0.2.0.0` |
+| `pabilo_payment_gateway-16.0.2.1.0.zip` | `16.0` | `v16.0.2.1.0` |
+| `pabilo_payment_gateway-17.0.2.1.0.zip` | `17.0` | `v17.0.2.1.0` |
 
 33 archivos cada uno, contenido idéntico al árbol versionado que se probó
 instalando. `dist/` está en `.gitignore`.
