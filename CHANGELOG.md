@@ -4,6 +4,11 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.1.1 / 17.0.2.1.1 — precio de lista 25 USD
+
+- **El precio del Apps Store queda en 25 USD** (la `2.1.0` salió con 15). Sin
+  cambios de comportamiento.
+
 ## 16.0.2.1.0 / 17.0.2.1.0 — módulo de pago
 
 Primera versión de pago, publicada en GitHub con el repositorio ya privado.
