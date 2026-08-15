@@ -32,3 +32,7 @@ Thumbs.db
 # Scripts temporales de prueba que se montan en el contenedor
 /_t_*.py
 /_probe*.py
+
+# Material de trabajo local (originales de capturas, etc.). Lo que se publica
+# vive en pabilo_payment_gateway/static/description/.
+/assets/
