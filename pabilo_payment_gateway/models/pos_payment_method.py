@@ -4,7 +4,7 @@ from datetime import datetime
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 from odoo.tools import float_round
-from odoo.tools.misc import formatLang
+from odoo.tools.misc import format_date, formatLang
 
 _logger = logging.getLogger(__name__)
 
@@ -142,6 +142,26 @@ class PosPaymentMethod(models.Model):
         return self.env['res.currency']._get_conversion_rate(
             from_currency, to_currency, company, date)
 
+    def _pabilo_rate_date(self, currencies):
+        """Fecha de la tasa que Odoo va a usar hoy, o False si no aplica.
+
+        `_get_rates` toma la ultima fila con fecha <= hoy, asi que la tasa vigente
+        puede ser de hace dias sin que nadie se entere. En Venezuela eso importa:
+        una tasa de la semana pasada da un monto que no coincide con el
+        comprobante del cliente, y el cajero merece verlo antes de verificar.
+        """
+        self.ensure_one()
+        company = self.env.company
+        ids = [c.id for c in currencies if c and c != company.currency_id]
+        if not ids:
+            return False
+        fila = self.env['res.currency.rate'].sudo().search([
+            ('currency_id', 'in', ids),
+            ('company_id', 'in', (False, company.id)),
+            ('name', '<=', fields.Date.context_today(self)),
+        ], order='name desc', limit=1)
+        return fila.name or False
+
     def _pabilo_resolve_amount(self, user_bank, amount, pos_currency_id=None,
                                alt_rate=None, amount_in_bank_currency=None):
         """Monto que se le va a pedir al banco, y de donde salio.
@@ -236,7 +256,7 @@ class PosPaymentMethod(models.Model):
         base = {'error_code': '', 'message': '', 'amount': amount, 'currency_name': '',
                 'label': '', 'converted': False, 'needs_confirm': False,
                 'source': '', 'rate': 0.0, 'line_label': '', 'pos_currency_name': '',
-                'rate_label': ''}
+                'rate_label': '', 'rate_date': ''}
 
         user_bank = self._pabilo_resolve_user_bank(user_bank_id)
         if not user_bank:
@@ -255,12 +275,21 @@ class PosPaymentMethod(models.Model):
                         if pos_currency_id else self.env['res.currency'])
         convertido = res['source'] in ('tasa', 'alterno', 'manual')
         rate_label = ''
+        rate_date = False
         if res['rate'] and pos_currency:
-            # "60,00 Bs por cada USD": la unidad importa, porque en Venezuela la
+            # "771,07 Bs por cada USD": la unidad importa, porque en Venezuela la
             # tasa se dice en los dos sentidos y confundirla invierte la cuenta.
             rate_label = _('%(tasa)s %(destino)s por cada %(origen)s',
                            tasa=formatLang(self.env, res['rate'], digits=4),
                            destino=currency.name, origen=pos_currency.name)
+            if res['source'] == 'tasa':
+                rate_date = self._pabilo_rate_date([pos_currency, currency])
+                # Solo se nombra la fecha si no es de hoy: decir "tasa de hoy" en
+                # cada cobro es ruido, decir "tasa del 14/08" es un aviso.
+                if rate_date and rate_date != fields.Date.context_today(self):
+                    rate_label = _('%(etiqueta)s, del %(fecha)s',
+                                   etiqueta=rate_label,
+                                   fecha=format_date(self.env, rate_date))
 
         return {
             'error_code': '',
@@ -279,6 +308,7 @@ class PosPaymentMethod(models.Model):
             'source': res['source'],
             'rate': res['rate'],
             'rate_label': rate_label,
+            'rate_date': fields.Date.to_string(rate_date) if rate_date else '',
         }
 
     def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None,

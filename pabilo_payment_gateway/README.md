@@ -95,6 +95,61 @@ Requisito de despliegue: el `dbfilter` de Odoo debe resolver a **una sola base**
 Si coincide con varias, Odoo no sabe cuál usar en una ruta pública y responde 404
 en lugar de procesar el webhook.
 
+## Multi-moneda
+
+Pabilo compara el monto contra el movimiento del banco, que está en la moneda de
+la cuenta: **bolívares** en los bancos venezolanos, dólares en Binance Pay. Si el
+POS cobra en otra moneda, el monto de la línea no sirve tal cual —pedir un
+movimiento de `0,60` cuando al banco entraron `36,00` da siempre
+`PAYMENT_AMOUNT_NOT_VALID`— así que se convierte antes de consultar.
+
+La conversión se hace **en el servidor**: el navegador no tiene las tasas de Odoo.
+
+### De dónde sale la tasa
+
+Por orden de prioridad:
+
+1. **El monto que escribió el cajero**, si eligió escribirlo.
+2. **`pabilo_alt_rate_field`**, si el método de pago dice dónde leer la tasa en el
+   POS. Es una ruta con puntos que se busca, en orden, en la línea de pago, en el
+   pedido y en el objeto `pos`: por ejemplo `config.foreign_rate`.
+3. **Las tasas nativas de Odoo** (`res.currency.rate`: Contabilidad →
+   Configuración → Monedas → Tasas), que es el caso normal.
+
+Sin tasa, **no se convierte a ciegas**: se responde `NO_CURRENCY_RATE`. Hace falta
+porque `_convert` no protesta cuando le falta —`_get_rates` cae en
+`COALESCE(..., 1.0)` y devuelve el monto intacto—, así que el fallo sería invisible
+y se mandarían dólares creyendo que son bolívares.
+
+Quien prefiera resolverlo en Python tiene `_pabilo_conversion_rate` como punto de
+extensión.
+
+### Cuándo hace falta `pabilo_alt_rate_field`
+
+**Casi nunca.** Los módulos de moneda alterna venezolanos suelen apoyarse en las
+tasas nativas de Odoo, y entonces el comportamiento por defecto ya da la cifra que
+el cajero ve en pantalla. Comprobado con `binaural_rate` (Binauraldev), que hereda
+`res.currency` y `res.currency.rate`: su `pos.config.foreign_rate` es un espejo de
+la tasa nativa.
+
+Configúralo solo si el módulo lleva una tasa **propia**, separada de la de Odoo.
+Para averiguarlo, compara `res.currency.rate` de la moneda del banco con lo que
+pinta el POS como importe alterno: si coinciden, deja el campo vacío.
+
+### Lo que ve el cajero
+
+Cuando hubo conversión, antes de pedir la referencia el POS muestra cuánto se va a
+buscar en el banco y con qué tasa salió —con su fecha, si no es de hoy— y deja
+elegir: aceptarlo, usar otra tasa o escribir el monto del comprobante del cliente.
+Si la moneda del POS ya es la del banco no se pregunta: no hay nada que elegir.
+
+Que el monto lo proponga el navegador no abre ningún hueco: el cajero ya decide el
+monto de la línea, y quien valida de verdad es Pabilo contra el movimiento real del
+banco.
+
+Se puede apagar el paso con **Elegir Como se Valida en el POS** en el método de
+pago.
+
 ## Limitaciones conocidas
 
 - Los enlaces de pago quedan en `pending` hasta que se pulsa **Consultar Estado**;
