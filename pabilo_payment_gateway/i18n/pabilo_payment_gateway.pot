@@ -6,14 +6,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0-20250909\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 22:27+0000\n"
-"PO-Revision-Date: 2026-08-14 22:27+0000\n"
+"POT-Creation-Date: 2026-08-18 16:28+0000\n"
+"PO-Revision-Date: 2026-08-18 16:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid "%(etiqueta)s, del %(fecha)s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid "%(tasa)s %(destino)s por cada %(origen)s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "%s  ·  tasa de Odoo: %s"
+msgstr ""
 
 #. module: pabilo_payment_gateway
 #. odoo-javascript
@@ -200,6 +221,14 @@ msgid "Créditos Consumidos"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment_method__pabilo_amount_confirm
+msgid ""
+"Cuando haya que convertir el monto, antes de pedir la referencia el POS muestra cuanto se va a buscar en el banco y con que tasa salio, y deja elegir: aceptarlo, usar otra tasa o escribir el monto a mano. Desactivalo solo si la tasa de Odoo es siempre exactamente la que se le cobro al cliente.\n"
+"\n"
+"Si la moneda del POS ya es la del banco no hay nada que elegir y no se pregunta."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__pabilo_user_bank_id
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pos_payment_method_view_form_inherit_pabilo
 msgid "Cuenta Bancaria Pabilo"
@@ -262,6 +291,13 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
 msgid "Datos del Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Debe ser un número mayor que cero."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -334,6 +370,11 @@ msgid "El usuario de Pabilo no está activo."
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_amount_confirm
+msgid "Elegir Como se Valida en el POS"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__is_trashed
 msgid "Eliminado"
 msgstr ""
@@ -400,6 +441,13 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_is_new
 msgid "Es Nuevo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Escribir el monto en %s…"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -525,6 +573,13 @@ msgid "Ingresa la referencia de pago."
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Intente de nuevo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,help:pabilo_payment_gateway.field_res_config_settings__pabilo_api_key
 msgid "Introduce tu appKey de Pabilo para verificar pagos"
 msgstr ""
@@ -580,6 +635,22 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
 #, python-format
 msgid "La fecha debe tener el formato AAAA-MM-DD."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "La línea de pago es %s."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid ""
+"La moneda en la que esta cuenta registra los movimientos no existe en Odoo. "
+"Activala en Contabilidad / Configuracion / Monedas."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -643,11 +714,39 @@ msgid "Mercantil Empresa (Test)"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__currency_id
+msgid "Moneda de los Movimientos"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_user_bank__currency_id
+msgid ""
+"Moneda en la que el banco registra los movimientos de esta cuenta. Es contra"
+" esta moneda que Pabilo compara el monto al verificar un pago, sin importar "
+"en que moneda cobre el POS."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Monto exacto en %s."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Monto que llegó al banco"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
 #: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
 #, python-format
 msgid ""
-"No hay cuentas bancarias de Pabilo configuradas. Sincronízalas desde los "
+"No hay cuentas bancarias de Pabilo configuradas. Sincronizalas desde los "
 "Ajustes."
 msgstr ""
 
@@ -656,6 +755,13 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
 #, python-format
 msgid "No hay enlace de pago asociado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "No se pudo calcular el monto"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -671,6 +777,13 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/models/pabilo_client.py:0
 #, python-format
 msgid "No se pudo conectar con Pabilo. Verifique la URL base y la red."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "No se puede verificar en esta cuenta"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -692,6 +805,15 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,help:pabilo_payment_gateway.field_payment_transaction__pabilo_reference
 msgid "Número de referencia del pago (Pago Móvil, Binance, Transferencia)"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#, python-format
+msgid ""
+"Odoo no tiene tasa de cambio para pasar el monto de %(desde)s a %(hasta)s. "
+"Cargala en Contabilidad / Configuracion / Monedas / Tasas."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -741,6 +863,7 @@ msgstr ""
 msgid ""
 "Pabilo ref: %s\n"
 "Cuenta: %s\n"
+"Monto verificado: %s\n"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -873,6 +996,13 @@ msgid "Resultado"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Revise la configuración de monedas en Odoo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-python
 #: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
 #, python-format
@@ -952,6 +1082,7 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #. odoo-python
 #: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
+#: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
 #, python-format
 msgid "Solo usuarios del Punto de Venta pueden verificar pagos Pabilo."
 msgstr ""
@@ -959,6 +1090,13 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__supports_payment_link
 msgid "Soporta Enlaces de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Tasa de cambio"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1025,6 +1163,20 @@ msgid ""
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Usar otra tasa…"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "Valor no válido"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
 msgid "Verificación Pabilo"
 msgstr ""
@@ -1072,6 +1224,20 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid "¿A cuál de estas cuentas envió el cliente el pago?"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "¿Cuánto llegó al banco?"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-javascript
+#: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
+#, python-format
+msgid "¿Cuántos %s por cada %s?"
 msgstr ""
 
 #. module: pabilo_payment_gateway
