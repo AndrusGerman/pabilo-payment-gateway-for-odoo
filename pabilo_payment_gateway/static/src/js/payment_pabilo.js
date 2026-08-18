@@ -45,7 +45,42 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return (this.pos.currency && this.pos.currency.id) || null;
         },
 
-        _verify: function (reference, amount, bankId, fechaPago) {
+        // Lee un valor por una ruta con puntos: 'config.tasa_del_dia'.
+        _read_path: function (root, path) {
+            return path.split('.').reduce(
+                (obj, key) => (obj === null || obj === undefined ? undefined : obj[key]),
+                root
+            );
+        },
+
+        // Tasa de un modulo de moneda alterna, si el metodo de pago dice donde
+        // buscarla. Estos modulos pintan un "restante alterno" con una tasa
+        // propia que no tiene por que ser la de Odoo; si existe, esa es la que el
+        // cliente vio, asi que es la que se propone.
+        _alt_rate: function (line) {
+            const path = this.payment_method.pabilo_alt_rate_field;
+            if (!path) {
+                return null;
+            }
+            const order = this.pos.get_order();
+            for (const root of [line, order, this.pos]) {
+                const valor = this._read_path(root, path);
+                const numero = parseFloat(valor);
+                if (!isNaN(numero) && numero > 0) {
+                    return numero;
+                }
+            }
+            console.warn('[pabilo] no se encontro la tasa alterna en la ruta:', path);
+            return null;
+        },
+
+        // Lo que teclea el cajero viene con el separador decimal de la base.
+        _parse_number: function (payload) {
+            const numero = parseFloat(String(payload || '').replace(',', '.'));
+            return isNaN(numero) ? null : numero;
+        },
+
+        _verify: function (reference, amount, bankId, fechaPago, rate, amountInBank) {
             // El timeout del RPC debe superar el del servidor (110 s) para que
             // gane el mensaje real de Pabilo y no un error de red genérico.
             return rpc.query(
@@ -60,6 +95,8 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                         this._source_name(),
                         fechaPago || null,
                         this._pos_currency_id(),
+                        rate || null,
+                        amountInBank === null || amountInBank === undefined ? null : amountInBank,
                     ],
                 },
                 { shadow: true, timeout: VERIFY_TIMEOUT_MS }
@@ -70,7 +107,7 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
         // informa: el que se verifica lo recalcula el servidor. Si la red falla
         // se devuelve null y el cajero ve el monto de la linea, que es peor
         // texto pero no cambia lo que se cobra.
-        _amount_preview: async function (amount, bankId) {
+        _amount_preview: async function (amount, bankId, rate, amountInBank) {
             try {
                 return await rpc.query(
                     {
@@ -81,6 +118,8 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                             amount,
                             bankId || null,
                             this._pos_currency_id(),
+                            rate || null,
+                            amountInBank === null || amountInBank === undefined ? null : amountInBank,
                         ],
                     },
                     { shadow: true, timeout: 10000 }
@@ -88,6 +127,109 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             } catch (error) {
                 return null;
             }
+        },
+
+        /**
+         * Deja elegir contra que monto se valida, cuando hubo que convertir.
+         *
+         * La tasa por defecto es la de Odoo (Contabilidad → Configuración →
+         * Monedas → Tasas), la misma que usa el resto del sistema. Pero la tasa
+         * contable no siempre es la del mostrador, asi que se puede cambiar la
+         * tasa o escribir directamente el monto del comprobante del cliente.
+         *
+         * Devuelve {preview, rate, amountInBank} o null si el cajero cancelo.
+         */
+        _choose_amount: async function (line, preview, bankId, rate) {
+            const origen =
+                preview.source === 'alterno'
+                    ? _t('tasa del POS')
+                    : _t('tasa de Odoo');
+            const { confirmed, payload: opcion } = await Gui.showPopup('SelectionPopup', {
+                title: _t('¿Cuánto llegó al banco?'),
+                body: _.str.sprintf(
+                    _t('La línea de pago es %s.'),
+                    preview.line_label || line.get_amount_str()
+                ),
+                list: [
+                    {
+                        id: 1,
+                        label: _.str.sprintf(
+                            _t('%s  ·  %s: %s'),
+                            preview.label,
+                            origen,
+                            preview.rate_label
+                        ),
+                        isSelected: true,
+                        item: 'aceptar',
+                    },
+                    { id: 2, label: _t('Usar otra tasa…'), item: 'tasa' },
+                    {
+                        id: 3,
+                        label: _.str.sprintf(
+                            _t('Escribir el monto en %s…'),
+                            preview.currency_name
+                        ),
+                        item: 'monto',
+                    },
+                ],
+            });
+            if (this._pabilo_cancelled || !confirmed || !opcion) {
+                return null;
+            }
+            if (opcion === 'aceptar') {
+                return { preview: preview, rate: rate, amountInBank: null };
+            }
+
+            const esTasa = opcion === 'tasa';
+            const res = await Gui.showPopup('NumberPopup', {
+                title: esTasa ? _t('Tasa de cambio') : _t('Monto que llegó al banco'),
+                body: esTasa
+                    ? _.str.sprintf(
+                          _t('¿Cuántos %s por cada %s?'),
+                          preview.currency_name,
+                          preview.pos_currency_name
+                      )
+                    : _.str.sprintf(_t('Monto exacto en %s.'), preview.currency_name),
+                startingValue: esTasa ? preview.rate : preview.amount,
+                isInputSelected: true,
+            });
+            if (this._pabilo_cancelled || !res.confirmed) {
+                return null;
+            }
+            const valor = this._parse_number(res.payload);
+            if (!valor || valor <= 0) {
+                await Gui.showPopup('ErrorPopup', {
+                    title: _t('Valor no válido'),
+                    body: _t('Debe ser un número mayor que cero.'),
+                });
+                return null;
+            }
+
+            // Se recalcula en el servidor: asi el numero y su formato salen del
+            // mismo sitio que luego verifica, y no pueden discrepar.
+            const nuevaTasa = esTasa ? valor : null;
+            const nuevoMonto = esTasa ? null : valor;
+            const recalculo = await this._amount_preview(
+                line.amount,
+                bankId,
+                nuevaTasa,
+                nuevoMonto
+            );
+            if (this._pabilo_cancelled) {
+                return null;
+            }
+            if (!recalculo || recalculo.error_code) {
+                await Gui.showPopup('ErrorPopup', {
+                    title: _t('No se pudo calcular el monto'),
+                    body: (recalculo && recalculo.message) || _t('Intente de nuevo.'),
+                });
+                return null;
+            }
+            return {
+                preview: recalculo,
+                rate: nuevaTasa,
+                amountInBank: esTasa ? null : recalculo.amount,
+            };
         },
 
         _fetch_accounts: async function () {
@@ -162,7 +304,12 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             // Con multi-moneda la línea dice 0,60 $ pero al banco entraron
             // 36,00 Bs, que es lo que Pabilo va a buscar. Se muestra ese, que es
             // el que el cajero puede contrastar con el comprobante del cliente.
-            const preview = await this._amount_preview(amount, bankId);
+            // Si hay un módulo de moneda alterna con tasa propia, esa es la que
+            // el cliente vio en pantalla, así que se propone antes que la de Odoo.
+            let rate = this._alt_rate(line);
+            let amountInBank = null;
+
+            let preview = await this._amount_preview(amount, bankId, rate, null);
             if (this._pabilo_cancelled) {
                 return false;
             }
@@ -175,6 +322,19 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 });
                 return false;
             }
+
+            // Solo se pregunta cuando hubo conversión. Si el POS ya cobra en la
+            // moneda del banco no hay nada que elegir y no se gasta un toque.
+            if (preview && preview.needs_confirm) {
+                const eleccion = await this._choose_amount(line, preview, bankId, rate);
+                if (!eleccion) {
+                    return false;
+                }
+                preview = eleccion.preview;
+                rate = eleccion.rate;
+                amountInBank = eleccion.amountInBank;
+            }
+
             const amountLabel = (preview && preview.label) || line.get_amount_str();
 
             const { confirmed, payload: reference } = await Gui.showPopup('NumberPopup', {
@@ -211,7 +371,14 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
 
             let result = null;
             try {
-                result = await this._verify(reference, amount, bankId, fechaPago);
+                result = await this._verify(
+                    reference,
+                    amount,
+                    bankId,
+                    fechaPago,
+                    rate,
+                    amountInBank
+                );
             } catch (error) {
                 await Gui.showPopup('ErrorPopup', {
                     title: _t('Sin respuesta de Pabilo'),

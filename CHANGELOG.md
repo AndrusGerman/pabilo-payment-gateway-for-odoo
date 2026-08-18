@@ -4,6 +4,43 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.3.0 / 17.0.2.3.0 — elegir la tasa en el POS
+
+La `2.2.0` arreglo que se convirtiera, pero dejo la tasa atada a la contable de
+Odoo. En Venezuela la tasa del mostrador no siempre es esa, y con un modulo de
+moneda alterna de terceros la pantalla puede estar mostrando una tasa propia. El
+monto convertido no coincidia con el comprobante del cliente y Pabilo volvia a
+responder `PAYMENT_AMOUNT_NOT_VALID`, ahora por centimos en vez de por un factor.
+
+- **La tasa sigue siendo la nativa de Odoo** (`res.currency.rate`, o sea
+  Contabilidad → Configuración → Monedas → Tasas): la misma que usa el resto del
+  sistema para facturar y contabilizar. Lo que cambia es que deja de ser la única
+  opción.
+- **El cajero elige cómo se valida.** Cuando hay conversión de por medio, antes de
+  pedir la referencia el POS muestra cuánto se va a buscar en el banco y con qué
+  tasa salió, y ofrece tres caminos: aceptarlo, **usar otra tasa** o **escribir el
+  monto** tal como aparece en el comprobante del cliente. Si la moneda del POS ya
+  es la del banco no hay nada que elegir y no se pregunta, para no gastar un toque
+  por cobro.
+- **`pabilo_alt_rate_field` en el método de pago**: ruta donde leer, en el POS, la
+  tasa de un módulo de moneda alterna que lleve la suya. Si está, se propone esa
+  en vez de la de Odoo, que es la que el cliente vio en pantalla. Vacío por
+  defecto — sin ella todo sigue con las tasas de Odoo.
+- **`_pabilo_conversion_rate` como punto de extensión** para quien prefiera
+  resolverlo en Python en vez de por configuración. Devuelve `0.0` cuando Odoo no
+  sabe la tasa, en vez de dejar que `_get_rates` responda su `COALESCE(..., 1.0)`
+  y el monto pase intacto sin que nadie se entere.
+- **El origen del monto queda en el log** (`tasa`, `alterno`, `manual`, `igual`),
+  para poder reconstruir después por qué se pidió esa cifra.
+- **Los campos de configuración de Pabilo se pueden tocar con la caja abierta.**
+  Odoo bloquea escribir en un método de pago con sesiones abiertas porque cambiarlo
+  a media sesión descuadra el cierre; estos no entran en ningún asiento, así que
+  obligar a cerrar la caja para corregir una tasa mal escrita no tenía sentido.
+
+Que el monto lo proponga el navegador no abre ningún hueco: el cajero ya decide el
+monto de la línea, y quien valida de verdad es Pabilo contra el movimiento real del
+banco. Un número equivocado se rechaza.
+
 ## 16.0.2.2.0 / 17.0.2.2.0 — multi-moneda en el POS
 
 - **El monto se convierte a la moneda del banco antes de verificar.** Con

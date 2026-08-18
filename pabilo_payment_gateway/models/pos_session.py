@@ -11,5 +11,7 @@ class PosSession(models.Model):
         params['search_params']['fields'] = params['search_params']['fields'] + [
             'pabilo_user_bank_id',
             'pabilo_account_hint',
+            'pabilo_amount_confirm',
+            'pabilo_alt_rate_field',
         ]
         return params
