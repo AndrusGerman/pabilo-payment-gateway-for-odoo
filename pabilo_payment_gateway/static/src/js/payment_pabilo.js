@@ -39,6 +39,12 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return parts.join(' - ').slice(0, 120);
         },
 
+        // Moneda de la linea de pago. El servidor la necesita para pasar el
+        // monto a la del banco, que es contra la que Pabilo compara.
+        _pos_currency_id: function () {
+            return (this.pos.currency && this.pos.currency.id) || null;
+        },
+
         _verify: function (reference, amount, bankId, fechaPago) {
             // El timeout del RPC debe superar el del servidor (110 s) para que
             // gane el mensaje real de Pabilo y no un error de red genérico.
@@ -53,10 +59,35 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                         bankId || null,
                         this._source_name(),
                         fechaPago || null,
+                        this._pos_currency_id(),
                     ],
                 },
                 { shadow: true, timeout: VERIFY_TIMEOUT_MS }
             );
+        },
+
+        // Monto que de verdad se va a buscar en el banco, ya convertido. Solo
+        // informa: el que se verifica lo recalcula el servidor. Si la red falla
+        // se devuelve null y el cajero ve el monto de la linea, que es peor
+        // texto pero no cambia lo que se cobra.
+        _amount_preview: async function (amount, bankId) {
+            try {
+                return await rpc.query(
+                    {
+                        model: 'pos.payment.method',
+                        method: 'pabilo_amount_preview',
+                        args: [
+                            [this.payment_method.id],
+                            amount,
+                            bankId || null,
+                            this._pos_currency_id(),
+                        ],
+                    },
+                    { shadow: true, timeout: 10000 }
+                );
+            } catch (error) {
+                return null;
+            }
         },
 
         _fetch_accounts: async function () {
@@ -128,12 +159,30 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 ? _.str.sprintf(_t('Cuenta destino: %s. '), bankLabel)
                 : '';
 
+            // Con multi-moneda la línea dice 0,60 $ pero al banco entraron
+            // 36,00 Bs, que es lo que Pabilo va a buscar. Se muestra ese, que es
+            // el que el cajero puede contrastar con el comprobante del cliente.
+            const preview = await this._amount_preview(amount, bankId);
+            if (this._pabilo_cancelled) {
+                return false;
+            }
+            if (preview && preview.error_code) {
+                // Problema de configuración: la verificación daría el mismo
+                // error, así que no se hace teclear la referencia para nada.
+                await Gui.showPopup('ErrorPopup', {
+                    title: _t('No se puede verificar en esta cuenta'),
+                    body: preview.message || _t('Revise la configuración de monedas en Odoo.'),
+                });
+                return false;
+            }
+            const amountLabel = (preview && preview.label) || line.get_amount_str();
+
             const { confirmed, payload: reference } = await Gui.showPopup('NumberPopup', {
                 title: _t('Referencia del pago'),
                 body: _.str.sprintf(
                     _t('%sMonto: %s. Ingrese los últimos 6 dígitos de la referencia.'),
                     accountHint,
-                    line.get_amount_str()
+                    amountLabel
                 ),
             });
 
@@ -190,7 +239,12 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 line.pabilo_is_new = result.is_new;
                 line.set_payment_status('done');
                 line.set_receipt_info(
-                    _.str.sprintf(_t('Pabilo ref: %s\nCuenta: %s\n'), reference, bankLabel || '-')
+                    _.str.sprintf(
+                        _t('Pabilo ref: %s\nCuenta: %s\nMonto verificado: %s\n'),
+                        reference,
+                        bankLabel || '-',
+                        amountLabel
+                    )
                 );
                 return true;
             }
