@@ -11,6 +11,11 @@
                        required="use_payment_terminal == 'pabilo'"
                        options="{'no_create': True}"
                        string="Cuenta Bancaria Pabilo"/>
+                <field name="pabilo_amount_confirm"
+                       invisible="use_payment_terminal != 'pabilo'"/>
+                <field name="pabilo_alt_rate_field"
+                       invisible="use_payment_terminal != 'pabilo'"
+                       placeholder="p. ej. tasa_bcv (vacío = tasa de Odoo)"/>
             </xpath>
         </field>
     </record>

@@ -1,6 +1,6 @@
 {
     'name': 'Pabilo Payment Gateway for Odoo',
-    'version': '17.0.2.2.0',
+    'version': '17.0.2.3.0',
     'summary': 'Verifica pagos móviles, transferencias y Binance en el POS con Pabilo',
     'description': """
 Pabilo Payment Gateway
@@ -19,7 +19,9 @@ Funcionalidades
 * Selección de la cuenta bancaria destino cuando hay varias.
 * Fecha del pago prellenada con hoy, para no teclearla en el caso normal.
 * Rechazo de referencias ya usadas, para no cobrar dos veces el mismo pago.
-* Multi-moneda: el monto se convierte a la moneda del banco antes de verificar.
+* Multi-moneda: el monto se convierte a la moneda del banco antes de verificar,
+  con las tasas nativas de Odoo.
+* El cajero elige como se valida: la tasa de Odoo, otra tasa o el monto exacto.
 * Referencia e ID de Pabilo guardados en el pago del POS, para auditoría.
 * Verificación manual y enlaces de pago desde las transacciones de pago.
 * Cuentas bancarias sincronizadas desde Pabilo en modo solo lectura.

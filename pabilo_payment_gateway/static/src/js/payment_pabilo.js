@@ -55,7 +55,41 @@ export class PaymentPabilo extends PaymentInterface {
         return (this.pos.currency && this.pos.currency.id) || null;
     }
 
-    _verify(reference, amount, bankId, fechaPago) {
+    // Lee un valor por una ruta con puntos: 'config.tasa_del_dia'.
+    _readPath(root, path) {
+        return path.split(".").reduce(
+            (obj, key) => (obj === null || obj === undefined ? undefined : obj[key]),
+            root
+        );
+    }
+
+    // Tasa de un modulo de moneda alterna, si el metodo de pago dice donde
+    // buscarla. Estos modulos pintan un "restante alterno" con una tasa propia
+    // que no tiene por que ser la de Odoo; si existe, esa es la que el cliente
+    // vio, asi que es la que se propone.
+    _altRate(line) {
+        const path = this.payment_method.pabilo_alt_rate_field;
+        if (!path) {
+            return null;
+        }
+        const order = this.pos.get_order();
+        for (const root of [line, order, this.pos]) {
+            const numero = parseFloat(this._readPath(root, path));
+            if (!isNaN(numero) && numero > 0) {
+                return numero;
+            }
+        }
+        console.warn("[pabilo] no se encontro la tasa alterna en la ruta:", path);
+        return null;
+    }
+
+    // Lo que teclea el cajero viene con el separador decimal de la base.
+    _parseNumber(payload) {
+        const numero = parseFloat(String(payload || "").replace(",", "."));
+        return isNaN(numero) ? null : numero;
+    }
+
+    _verify(reference, amount, bankId, fechaPago, rate, amountInBank) {
         // El timeout del ORM debe superar el del servidor (110 s) para que gane
         // el mensaje real de Pabilo y no un error de red generico.
         return this.orm.silent
@@ -70,6 +104,8 @@ export class PaymentPabilo extends PaymentInterface {
                     this.sourceName,
                     fechaPago || null,
                     this.posCurrencyId,
+                    rate || null,
+                    amountInBank === null || amountInBank === undefined ? null : amountInBank,
                 ],
                 {},
                 { timeout: VERIFY_TIMEOUT_MS }
@@ -80,18 +116,109 @@ export class PaymentPabilo extends PaymentInterface {
     // informa: el que se verifica lo recalcula el servidor. Si la red falla se
     // devuelve null y el cajero ve el monto de la linea, que es peor texto pero
     // no cambia lo que se cobra.
-    async _amount_preview(amount, bankId) {
+    async _amount_preview(amount, bankId, rate, amountInBank) {
         try {
             return await this.orm.silent.call(
                 "pos.payment.method",
                 "pabilo_amount_preview",
-                [[this.payment_method.id], amount, bankId || null, this.posCurrencyId],
+                [
+                    [this.payment_method.id],
+                    amount,
+                    bankId || null,
+                    this.posCurrencyId,
+                    rate || null,
+                    amountInBank === null || amountInBank === undefined ? null : amountInBank,
+                ],
                 {},
                 { timeout: 10000 }
             );
         } catch (error) {
             return null;
         }
+    }
+
+    /**
+     * Deja elegir contra que monto se valida, cuando hubo que convertir.
+     *
+     * La tasa por defecto es la de Odoo (Contabilidad → Configuración → Monedas
+     * → Tasas), la misma que usa el resto del sistema. Pero la tasa contable no
+     * siempre es la del mostrador, asi que se puede cambiar la tasa o escribir
+     * directamente el monto del comprobante del cliente.
+     *
+     * Devuelve {preview, rate, amountInBank} o null si el cajero cancelo.
+     */
+    async _chooseAmount(line, preview, bankId, rate) {
+        const origen = preview.source === "alterno" ? _t("tasa del POS") : _t("tasa de Odoo");
+        const { confirmed, payload: opcion } = await this.popup.add(SelectionPopup, {
+            title: _t("¿Cuánto llegó al banco?"),
+            body: _t("La línea de pago es %s.", preview.line_label || line.get_amount_str()),
+            list: [
+                {
+                    id: 1,
+                    label: _t("%s  ·  %s: %s", preview.label, origen, preview.rate_label),
+                    isSelected: true,
+                    item: "aceptar",
+                },
+                { id: 2, label: _t("Usar otra tasa…"), item: "tasa" },
+                {
+                    id: 3,
+                    label: _t("Escribir el monto en %s…", preview.currency_name),
+                    item: "monto",
+                },
+            ],
+        });
+        if (this._pabilo_cancelled || !confirmed || !opcion) {
+            return null;
+        }
+        if (opcion === "aceptar") {
+            return { preview: preview, rate: rate, amountInBank: null };
+        }
+
+        const esTasa = opcion === "tasa";
+        const res = await this.popup.add(NumberPopup, {
+            title: esTasa ? _t("Tasa de cambio") : _t("Monto que llegó al banco"),
+            body: esTasa
+                ? _t(
+                      "¿Cuántos %s por cada %s?",
+                      preview.currency_name,
+                      preview.pos_currency_name
+                  )
+                : _t("Monto exacto en %s.", preview.currency_name),
+            startingValue: esTasa ? preview.rate : preview.amount,
+            isInputSelected: true,
+        });
+        if (this._pabilo_cancelled || !res.confirmed) {
+            return null;
+        }
+        const valor = this._parseNumber(res.payload);
+        if (!valor || valor <= 0) {
+            await this.popup.add(ErrorPopup, {
+                title: _t("Valor no válido"),
+                body: _t("Debe ser un número mayor que cero."),
+            });
+            return null;
+        }
+
+        // Se recalcula en el servidor: asi el numero y su formato salen del mismo
+        // sitio que luego verifica, y no pueden discrepar.
+        const nuevaTasa = esTasa ? valor : null;
+        const nuevoMonto = esTasa ? null : valor;
+        const recalculo = await this._amount_preview(line.amount, bankId, nuevaTasa, nuevoMonto);
+        if (this._pabilo_cancelled) {
+            return null;
+        }
+        if (!recalculo || recalculo.error_code) {
+            await this.popup.add(ErrorPopup, {
+                title: _t("No se pudo calcular el monto"),
+                body: (recalculo && recalculo.message) || _t("Intente de nuevo."),
+            });
+            return null;
+        }
+        return {
+            preview: recalculo,
+            rate: nuevaTasa,
+            amountInBank: esTasa ? null : recalculo.amount,
+        };
     }
 
     async _fetch_accounts() {
@@ -161,7 +288,12 @@ export class PaymentPabilo extends PaymentInterface {
         // Con multi-moneda la linea dice 0,60 $ pero al banco entraron 36,00 Bs,
         // que es lo que Pabilo va a buscar. Se muestra ese, que es el que el
         // cajero puede contrastar con el comprobante del cliente.
-        const preview = await this._amount_preview(amount, bankId);
+        // Si hay un modulo de moneda alterna con tasa propia, esa es la que el
+        // cliente vio en pantalla, asi que se propone antes que la de Odoo.
+        let rate = this._altRate(line);
+        let amountInBank = null;
+
+        let preview = await this._amount_preview(amount, bankId, rate, null);
         if (this._pabilo_cancelled) {
             return false;
         }
@@ -174,6 +306,19 @@ export class PaymentPabilo extends PaymentInterface {
             });
             return false;
         }
+
+        // Solo se pregunta cuando hubo conversion. Si el POS ya cobra en la
+        // moneda del banco no hay nada que elegir y no se gasta un toque.
+        if (preview && preview.needs_confirm) {
+            const eleccion = await this._chooseAmount(line, preview, bankId, rate);
+            if (!eleccion) {
+                return false;
+            }
+            preview = eleccion.preview;
+            rate = eleccion.rate;
+            amountInBank = eleccion.amountInBank;
+        }
+
         const amountLabel = (preview && preview.label) || line.get_amount_str();
 
         const { confirmed, payload: reference } = await this.popup.add(NumberPopup, {
@@ -210,7 +355,14 @@ export class PaymentPabilo extends PaymentInterface {
 
         let result = null;
         try {
-            result = await this._verify(reference, amount, bankId, fechaPago);
+            result = await this._verify(
+                reference,
+                amount,
+                bankId,
+                fechaPago,
+                rate,
+                amountInBank
+            );
         } catch (error) {
             await this.popup.add(ErrorPopup, {
                 title: _t("Sin respuesta de Pabilo"),
