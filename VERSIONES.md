@@ -291,8 +291,8 @@ docker compose run --rm -T --entrypoint bash web `
   -c "odoo -d test_limpio --db_host=db --db_user=odoo --db_password=odoo -u pabilo_payment_gateway --i18n-export=/mnt/extra-addons/pabilo_payment_gateway/i18n/pabilo_payment_gateway.pot --modules=pabilo_payment_gateway --stop-after-init"
 ```
 
-Deben salir ~170 mensajes, con 18 referencias a `pabilo_client.py` (el mapa de
-errores en `_lt`) y 14 a `payment_pabilo.js`. Si las del JS bajan a 0, el
+Deben salir ~200 mensajes, con 20 referencias a `pabilo_client.py` (el mapa de
+errores en `_lt`) y ~30 a `payment_pabilo.js`. Si las del JS bajan a 0, el
 transpilador no está reconociendo el archivo.
 
 ### Limpieza
