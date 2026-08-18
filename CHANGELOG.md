@@ -4,6 +4,20 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.3.1 / 17.0.2.3.1 — se ve de cuándo es la tasa
+
+- **La etiqueta de la tasa dice su fecha cuando no es de hoy**: «771,07 VES por
+  cada USD, del 14/08/2026». `_get_rates` toma la última fila con fecha ≤ hoy, así
+  que la tasa vigente puede ser de hace días sin que nadie se entere; en Venezuela
+  eso da un monto que no cuadra con el comprobante del cliente. Si la tasa es de
+  hoy no se dice nada, para no meter ruido en cada cobro.
+
+Verificado contra el montaje real de un cliente (Odoo 16, `binaural_rate` de
+Binauraldev): ese módulo **guarda la tasa en el `res.currency.rate` nativo** y
+`pos.config.foreign_rate` es un espejo suyo, así que el comportamiento por defecto
+del addon ya da la cifra que el cajero ve en pantalla y no hace falta configurar
+`pabilo_alt_rate_field`. El campo queda para cuando las dos se separan.
+
 ## 16.0.2.3.0 / 17.0.2.3.0 — elegir la tasa en el POS
 
 La `2.2.0` arreglo que se convirtiera, pero dejo la tasa atada a la contable de
