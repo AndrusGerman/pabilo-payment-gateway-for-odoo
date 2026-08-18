@@ -45,35 +45,6 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return (this.pos.currency && this.pos.currency.id) || null;
         },
 
-        // Lee un valor por una ruta con puntos: 'config.tasa_del_dia'.
-        _read_path: function (root, path) {
-            return path.split('.').reduce(
-                (obj, key) => (obj === null || obj === undefined ? undefined : obj[key]),
-                root
-            );
-        },
-
-        // Tasa de un modulo de moneda alterna, si el metodo de pago dice donde
-        // buscarla. Estos modulos pintan un "restante alterno" con una tasa
-        // propia que no tiene por que ser la de Odoo; si existe, esa es la que el
-        // cliente vio, asi que es la que se propone.
-        _alt_rate: function (line) {
-            const path = this.payment_method.pabilo_alt_rate_field;
-            if (!path) {
-                return null;
-            }
-            const order = this.pos.get_order();
-            for (const root of [line, order, this.pos]) {
-                const valor = this._read_path(root, path);
-                const numero = parseFloat(valor);
-                if (!isNaN(numero) && numero > 0) {
-                    return numero;
-                }
-            }
-            console.warn('[pabilo] no se encontro la tasa alterna en la ruta:', path);
-            return null;
-        },
-
         // Lo que teclea el cajero viene con el separador decimal de la base.
         _parse_number: function (payload) {
             const numero = parseFloat(String(payload || '').replace(',', '.'));
@@ -132,18 +103,14 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
         /**
          * Deja elegir contra que monto se valida, cuando hubo que convertir.
          *
-         * La tasa por defecto es la de Odoo (Contabilidad → Configuración →
-         * Monedas → Tasas), la misma que usa el resto del sistema. Pero la tasa
-         * contable no siempre es la del mostrador, asi que se puede cambiar la
-         * tasa o escribir directamente el monto del comprobante del cliente.
+         * La tasa es la de Odoo (Contabilidad → Configuración → Monedas →
+         * Tasas), la misma que usa el resto del sistema. Pero la tasa contable no
+         * siempre es la del mostrador, asi que se puede cambiar la tasa o
+         * escribir directamente el monto del comprobante del cliente.
          *
          * Devuelve {preview, rate, amountInBank} o null si el cajero cancelo.
          */
         _choose_amount: async function (line, preview, bankId, rate) {
-            const origen =
-                preview.source === 'alterno'
-                    ? _t('tasa del POS')
-                    : _t('tasa de Odoo');
             const { confirmed, payload: opcion } = await Gui.showPopup('SelectionPopup', {
                 title: _t('¿Cuánto llegó al banco?'),
                 body: _.str.sprintf(
@@ -154,9 +121,8 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                     {
                         id: 1,
                         label: _.str.sprintf(
-                            _t('%s  ·  %s: %s'),
+                            _t('%s  ·  tasa de Odoo: %s'),
                             preview.label,
-                            origen,
                             preview.rate_label
                         ),
                         isSelected: true,
@@ -304,9 +270,9 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             // Con multi-moneda la línea dice 0,60 $ pero al banco entraron
             // 36,00 Bs, que es lo que Pabilo va a buscar. Se muestra ese, que es
             // el que el cajero puede contrastar con el comprobante del cliente.
-            // Si hay un módulo de moneda alterna con tasa propia, esa es la que
-            // el cliente vio en pantalla, así que se propone antes que la de Odoo.
-            let rate = this._alt_rate(line);
+            // La tasa la resuelve el servidor con las tasas nativas de Odoo.
+            // Estas dos solo se llenan si el cajero decide otra cosa.
+            let rate = null;
             let amountInBank = null;
 
             let preview = await this._amount_preview(amount, bankId, rate, null);
