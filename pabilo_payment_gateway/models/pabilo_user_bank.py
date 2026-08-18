@@ -9,6 +9,17 @@ _logger = logging.getLogger(__name__)
 # Única puerta por la que se permite escribir en el espejo local: la sincronización.
 SYNC_CONTEXT_KEY = 'pabilo_sync'
 
+# Moneda en la que cada proveedor registra sus movimientos. Los bancos
+# venezolanos operan en bolivares; Binance Pay, en dolares. Se deduce del
+# proveedor y no se guarda: la API de Pabilo no devuelve la moneda de la cuenta
+# y el espejo es de solo lectura, asi que no habria donde escribirla.
+BANK_CURRENCY_BY_PROVIDER = {
+    'BINANCE_APP': ('USD',),
+}
+# VEF es el codigo viejo del bolivar. Muchas bases venezolanas siguen con el,
+# asi que se acepta como alternativa, pero VES manda si estan los dos.
+DEFAULT_BANK_CURRENCY_NAMES = ('VES', 'VEF')
+
 
 class PabiloUserBank(models.Model):
     """Espejo local de solo lectura de las cuentas bancarias de Pabilo.
@@ -47,6 +58,14 @@ class PabiloUserBank(models.Model):
     is_trashed = fields.Boolean(string='Eliminado', default=False)
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     display_name = fields.Char(string='Nombre', compute='_compute_display_name', store=True)
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Moneda de los Movimientos',
+        compute='_compute_currency_id',
+        help='Moneda en la que el banco registra los movimientos de esta cuenta. '
+             'Es contra esta moneda que Pabilo compara el monto al verificar un '
+             'pago, sin importar en que moneda cobre el POS.',
+    )
 
     _sql_constraints = [
         ('pabilo_id_company_uniq',
@@ -66,6 +85,25 @@ class PabiloUserBank(models.Model):
             if rec.account_number:
                 parts.append(f"({rec.account_number[-4:]})")
             rec.display_name = ' - '.join(parts) if parts else rec.pabilo_id
+
+    @api.depends('provider')
+    def _compute_currency_id(self):
+        # active_test=False: en una base cuya moneda de compania es el dolar, el
+        # bolivar suele quedar desactivado, y aun asi es la moneda del banco.
+        currencies = self.env['res.currency'].with_context(active_test=False).sudo()
+        cache = {}
+        for rec in self:
+            names = BANK_CURRENCY_BY_PROVIDER.get(rec.provider, DEFAULT_BANK_CURRENCY_NAMES)
+            if names not in cache:
+                # Se recorren en orden y gana el primero que exista. Un search
+                # con `in` devolveria el alfabeticamente menor, o sea VEF.
+                found = currencies.browse()
+                for name in names:
+                    found = currencies.search([('name', '=', name)], limit=1)
+                    if found:
+                        break
+                cache[names] = found
+            rec.currency_id = cache[names]
 
     # -- Solo lectura -----------------------------------------------------
     # La ACL ya niega write/create/unlink a todos los grupos, pero eso lo

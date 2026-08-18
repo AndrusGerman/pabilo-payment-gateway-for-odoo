@@ -8,6 +8,7 @@
                 <field name="display_name"/>
                 <field name="provider"/>
                 <field name="account_number"/>
+                <field name="currency_id"/>
                 <field name="supports_payment_link"/>
                 <field name="is_trashed"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -35,6 +36,7 @@
                         <group>
                             <field name="account_number"/>
                             <field name="account_type"/>
+                            <field name="currency_id"/>
                             <field name="supports_payment_link"/>
                             <field name="is_trashed"/>
                             <field name="company_id" groups="base.group_multi_company"/>

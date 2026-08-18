@@ -49,6 +49,12 @@ export class PaymentPabilo extends PaymentInterface {
         return parts.join(" - ").slice(0, 120);
     }
 
+    // Moneda de la linea de pago. El servidor la necesita para pasar el monto a
+    // la del banco, que es contra la que Pabilo compara.
+    get posCurrencyId() {
+        return (this.pos.currency && this.pos.currency.id) || null;
+    }
+
     _verify(reference, amount, bankId, fechaPago) {
         // El timeout del ORM debe superar el del servidor (110 s) para que gane
         // el mensaje real de Pabilo y no un error de red generico.
@@ -63,10 +69,29 @@ export class PaymentPabilo extends PaymentInterface {
                     bankId || null,
                     this.sourceName,
                     fechaPago || null,
+                    this.posCurrencyId,
                 ],
                 {},
                 { timeout: VERIFY_TIMEOUT_MS }
             );
+    }
+
+    // Monto que de verdad se va a buscar en el banco, ya convertido. Solo
+    // informa: el que se verifica lo recalcula el servidor. Si la red falla se
+    // devuelve null y el cajero ve el monto de la linea, que es peor texto pero
+    // no cambia lo que se cobra.
+    async _amount_preview(amount, bankId) {
+        try {
+            return await this.orm.silent.call(
+                "pos.payment.method",
+                "pabilo_amount_preview",
+                [[this.payment_method.id], amount, bankId || null, this.posCurrencyId],
+                {},
+                { timeout: 10000 }
+            );
+        } catch (error) {
+            return null;
+        }
     }
 
     async _fetch_accounts() {
@@ -133,12 +158,30 @@ export class PaymentPabilo extends PaymentInterface {
 
         const accountHint = bankLabel ? _t("Cuenta destino: %s. ", bankLabel) : "";
 
+        // Con multi-moneda la linea dice 0,60 $ pero al banco entraron 36,00 Bs,
+        // que es lo que Pabilo va a buscar. Se muestra ese, que es el que el
+        // cajero puede contrastar con el comprobante del cliente.
+        const preview = await this._amount_preview(amount, bankId);
+        if (this._pabilo_cancelled) {
+            return false;
+        }
+        if (preview && preview.error_code) {
+            // Problema de configuracion: la verificacion daria el mismo error,
+            // asi que no se hace teclear la referencia para nada.
+            await this.popup.add(ErrorPopup, {
+                title: _t("No se puede verificar en esta cuenta"),
+                body: preview.message || _t("Revise la configuración de monedas en Odoo."),
+            });
+            return false;
+        }
+        const amountLabel = (preview && preview.label) || line.get_amount_str();
+
         const { confirmed, payload: reference } = await this.popup.add(NumberPopup, {
             title: _t("Referencia del pago"),
             body: _t(
                 "%sMonto: %s. Ingrese los últimos 6 dígitos de la referencia.",
                 accountHint,
-                line.get_amount_str()
+                amountLabel
             ),
         });
 
@@ -200,10 +243,11 @@ export class PaymentPabilo extends PaymentInterface {
             line.set_payment_status("done");
             line.set_receipt_info(
                 _t(
-                    "Pabilo ref: %s\nCuenta: %s\nFecha: %s\n",
+                    "Pabilo ref: %s\nCuenta: %s\nFecha: %s\nMonto verificado: %s\n",
                     reference,
                     bankLabel || "-",
-                    fechaPago
+                    fechaPago,
+                    amountLabel
                 )
             );
             return true;

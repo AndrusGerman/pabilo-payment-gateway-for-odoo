@@ -4,6 +4,39 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.2.0 / 17.0.2.2.0 — multi-moneda en el POS
+
+- **El monto se convierte a la moneda del banco antes de verificar.** Con
+  multi-moneda el POS mandaba a Pabilo el monto de la línea tal cual: en una
+  venta de 0,60 $ pagada con 36,00 Bs, se le pedía al banco un movimiento de
+  0,60 y la respuesta era siempre `PAYMENT_AMOUNT_NOT_VALID` ("monto no
+  coincide"). Ahora `pabilo_verify_payment` recibe también la moneda de la línea
+  y convierte con la tasa de Odoo (`res.currency._convert`) a la moneda en la que
+  el banco registra los movimientos. La conversión vive en el servidor, no en el
+  navegador: el POS no tiene las tasas, y así el monto que se verifica no depende
+  de lo que diga el cliente.
+- **La moneda de cada cuenta sale del proveedor** (`pabilo.user.bank.currency_id`,
+  calculado): bolívares en los bancos venezolanos, dólares en Binance Pay. Se
+  deduce en vez de guardarse porque la API de Pabilo no devuelve la moneda de la
+  cuenta y el espejo local es de solo lectura. Acepta `VEF` si la base no tiene
+  `VES`, y busca con `active_test=False`, porque en libros en dólares el bolívar
+  suele estar desactivado.
+- **Sin tasa de cambio, error explícito en vez de un cobro mal verificado.**
+  `_convert` no protesta cuando le falta la tasa: `_get_rates` cae en
+  `COALESCE(..., 1.0)` y devuelve el monto intacto, así que el POS habría seguido
+  mandando dólares creyendo que eran bolívares. Se comprueba antes y el cajero ve
+  `NO_CURRENCY_RATE` con la ruta donde cargarla.
+- **El popup de la referencia muestra el monto que se va a buscar en el banco**,
+  no el de la línea, que es el que el cajero puede contrastar con el comprobante
+  del cliente. Lo calcula el mismo código que luego verifica
+  (`pabilo_amount_preview`), así que no pueden discrepar. Si esa consulta falla
+  por red, se muestra el monto de la línea y la verificación sigue siendo
+  correcta. Un problema de configuración se avisa **antes** de teclear la
+  referencia, no después.
+- **El monto verificado queda en el recibo**, junto a la referencia y la cuenta.
+- **Redondeo a dos decimales siempre**, que es como compara Pabilo, sin depender
+  del `rounding` que tengan configurado las monedas en Odoo.
+
 ## 16.0.2.1.1 / 17.0.2.1.1 — precio de lista 25 USD
 
 - **El precio del Apps Store queda en 25 USD** (la `2.1.0` salió con 15). Sin

@@ -31,7 +31,7 @@ indica otro servidor.
 | Pieza | Rol |
 | :--- | :--- |
 | `models/pabilo_client.py` | Cliente HTTP único. Concentra URL base, header `appKey`, parseo y normalización de errores. |
-| `models/pos_payment_method.py` | Método RPC `pabilo_verify_payment` que llama el POS. |
+| `models/pos_payment_method.py` | Métodos RPC que llama el POS: `pabilo_verify_payment`, `pabilo_amount_preview` y la conversión de moneda. |
 | `static/src/js/payment_pabilo.js` | `PaymentInterface` del POS: teclado numérico, fecha del pago y selección de cuenta. |
 | `static/src/js/models.js` | `register_payment_method('pabilo', …)` y serialización de los campos en la línea de pago. |
 | `models/pabilo_user_bank.py` | Espejo **de solo lectura** de las cuentas de Pabilo. |

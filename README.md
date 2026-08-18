@@ -57,6 +57,9 @@ La URL base del backend vive en el parámetro de sistema `pabilo.api_url`
 
 - Método de pago del POS que verifica contra la API de Pabilo en tiempo real.
 - Pago móvil, transferencias y Binance con el mismo método.
+- **Multi-moneda**: si el POS cobra en dólares y el banco registra en bolívares,
+  el monto se convierte con la tasa de Odoo antes de consultar. Sin tasa cargada
+  el cajero ve un error claro, en vez de un "monto no coincide" incomprensible.
 - Fecha del pago prellenada con hoy, calculada en la zona local del navegador.
 - Rechazo de referencias ya usadas, para no cobrar dos veces el mismo pago.
 - Referencia e ID de Pabilo persistidos en `pos.payment` y en el recibo.
