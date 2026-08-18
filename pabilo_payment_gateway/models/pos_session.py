@@ -12,6 +12,5 @@ class PosSession(models.Model):
             'pabilo_user_bank_id',
             'pabilo_account_hint',
             'pabilo_amount_confirm',
-            'pabilo_alt_rate_field',
         ]
         return params

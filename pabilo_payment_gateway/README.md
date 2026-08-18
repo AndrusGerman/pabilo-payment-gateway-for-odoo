@@ -31,7 +31,7 @@ indica otro servidor.
 | Pieza | Rol |
 | :--- | :--- |
 | `models/pabilo_client.py` | Cliente HTTP único. Concentra URL base, header `appKey`, parseo y normalización de errores. |
-| `models/pos_payment_method.py` | Métodos RPC que llama el POS: `pabilo_verify_payment`, `pabilo_amount_preview` y la resolución del monto (tasa de Odoo, tasa alterna o monto escrito por el cajero). |
+| `models/pos_payment_method.py` | Métodos RPC que llama el POS: `pabilo_verify_payment`, `pabilo_amount_preview` y la resolución del monto en la moneda del banco. |
 | `static/src/js/payment_pabilo.js` | `PaymentInterface` del POS: teclado numérico, fecha del pago y selección de cuenta. |
 | `static/src/js/models.js` | `register_payment_method('pabilo', …)` y serialización de los campos en la línea de pago. |
 | `models/pabilo_user_bank.py` | Espejo **de solo lectura** de las cuentas de Pabilo. |
@@ -107,34 +107,28 @@ La conversión se hace **en el servidor**: el navegador no tiene las tasas de Od
 
 ### De dónde sale la tasa
 
-Por orden de prioridad:
+**De las tasas nativas de Odoo** (`res.currency.rate`: Contabilidad →
+Configuración → Monedas → Tasas), las mismas que usa el resto del sistema para
+facturar y contabilizar. No hay nada que configurar.
 
-1. **El monto que escribió el cajero**, si eligió escribirlo.
-2. **`pabilo_alt_rate_field`**, si el método de pago dice dónde leer la tasa en el
-   POS. Es una ruta con puntos que se busca, en orden, en la línea de pago, en el
-   pedido y en el objeto `pos`: por ejemplo `config.foreign_rate`.
-3. **Las tasas nativas de Odoo** (`res.currency.rate`: Contabilidad →
-   Configuración → Monedas → Tasas), que es el caso normal.
+`_get_rates` toma la última fila con fecha ≤ hoy, así que la tasa vigente puede
+ser de hace días. Cuando no es de hoy, el POS lo dice: «771,07 VES por cada USD,
+del 14/08/2026».
 
 Sin tasa, **no se convierte a ciegas**: se responde `NO_CURRENCY_RATE`. Hace falta
 porque `_convert` no protesta cuando le falta —`_get_rates` cae en
-`COALESCE(..., 1.0)` y devuelve el monto intacto—, así que el fallo sería invisible
-y se mandarían dólares creyendo que son bolívares.
+`COALESCE(..., 1.0)` y devuelve el monto intacto—, así que el fallo sería
+invisible y se mandarían dólares creyendo que son bolívares.
 
-Quien prefiera resolverlo en Python tiene `_pabilo_conversion_rate` como punto de
-extensión.
+Si en el mostrador se cobró con otra tasa, el cajero la corrige en el momento (ver
+abajo). Y quien tenga una fuente de tasas de verdad distinta puede heredar
+`_pabilo_conversion_rate`.
 
-### Cuándo hace falta `pabilo_alt_rate_field`
-
-**Casi nunca.** Los módulos de moneda alterna venezolanos suelen apoyarse en las
-tasas nativas de Odoo, y entonces el comportamiento por defecto ya da la cifra que
-el cajero ve en pantalla. Comprobado con `binaural_rate` (Binauraldev), que hereda
-`res.currency` y `res.currency.rate`: su `pos.config.foreign_rate` es un espejo de
-la tasa nativa.
-
-Configúralo solo si el módulo lleva una tasa **propia**, separada de la de Odoo.
-Para averiguarlo, compara `res.currency.rate` de la moneda del banco con lo que
-pinta el POS como importe alterno: si coinciden, deja el campo vacío.
+> **Sobre los módulos de moneda alterna.** Las localizaciones venezolanas que
+> pintan un "Restante alterno" en el POS suelen apoyarse en las tasas nativas, así
+> que no hace falta hacer nada. Comprobado con `binaural_rate` (Binauraldev), que
+> hereda `res.currency` y `res.currency.rate`: su `pos.config.foreign_rate` no está
+> guardado, se calcula al vuelo desde la tasa nativa. Es el mismo número.
 
 ### Lo que ve el cajero
 

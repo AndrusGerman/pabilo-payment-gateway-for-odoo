@@ -4,6 +4,21 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.3.2 / 17.0.2.3.2 — una sola tasa
+
+- **Fuera `pabilo_alt_rate_field`.** El campo salió de suponer que un módulo de
+  moneda alterna llevaría su propia tasa, separada de la de Odoo. Comprobado
+  contra uno real —`binaural_rate`, de Binauraldev— no la lleva: su
+  `pos.config.foreign_rate` **ni siquiera está guardado**, se calcula al vuelo
+  desde `res.currency.rate`. Las dos "fuentes" eran el mismo número por dos
+  caminos, así que la perilla solo daba a elegir entre lo mismo, y eso confunde
+  más de lo que ayuda.
+- **Queda una sola tasa: la nativa de Odoo**, y dos escapes para cuando no sirve,
+  que no hay que configurar: el cajero puede escribir otra tasa o el monto exacto
+  del comprobante. Para quien de verdad tenga otra fuente sigue estando
+  `_pabilo_conversion_rate`, que es una herencia de cinco líneas.
+- El origen del monto `alterno` pasa a llamarse `tasa_elegida`, que es lo que es.
+
 ## 16.0.2.3.1 / 17.0.2.3.1 — se ve de cuándo es la tasa
 
 - **La etiqueta de la tasa dice su fecha cuando no es de hoy**: «771,07 VES por

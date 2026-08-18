@@ -39,18 +39,6 @@ class PosPaymentMethod(models.Model):
              'Si la moneda del POS ya es la del banco no hay nada que elegir y no '
              'se pregunta.',
     )
-    pabilo_alt_rate_field = fields.Char(
-        string='Campo de la Tasa Alterna',
-        help='Dejalo vacio salvo que uses un modulo de moneda alterna que NO se '
-             'apoye en las tasas de Odoo, sino en una propia (las localizaciones '
-             'venezolanas suelen pintar un "Restante alterno" con ella). Escribe '
-             'aqui donde leerla en el POS y se propondra esa en vez de la de Odoo, '
-             'para que el monto coincida con lo que ve el cajero en pantalla.\n\n'
-             'Es una ruta con puntos que se busca, en orden, en la linea de pago, '
-             'en el pedido y en el objeto pos: por ejemplo "tasa_bcv" o '
-             '"config.tasa_del_dia".',
-    )
-
     def _get_payment_terminal_selection(self):
         return super()._get_payment_terminal_selection() + [('pabilo', 'Pabilo')]
 
@@ -60,11 +48,7 @@ class PosPaymentMethod(models.Model):
         # en ningun asiento, solo dicen contra que cuenta se verifica y como se
         # resuelve el monto en pantalla. Obligar a cerrar la caja para corregir
         # una tasa mal escrita seria absurdo.
-        whitelisted_fields = {
-            'pabilo_user_bank_id',
-            'pabilo_amount_confirm',
-            'pabilo_alt_rate_field',
-        }
+        whitelisted_fields = {'pabilo_user_bank_id', 'pabilo_amount_confirm'}
         return super()._is_write_forbidden(fields - whitelisted_fields)
 
     # ==========================================
@@ -76,12 +60,16 @@ class PosPaymentMethod(models.Model):
     # sistema para facturar y contabilizar, no un invento de este modulo. Por eso
     # la conversion es `res.currency._convert` y no una multiplicacion propia.
     #
-    # Sobre eso hay dos escapes, porque la tasa contable no siempre es la que se
-    # le cobro al cliente en el mostrador:
-    #   - `pabilo_alt_rate_field`, para leer la tasa de un modulo de moneda
-    #     alterna que lleve la suya;
-    #   - la confirmacion en el POS, donde el cajero puede cambiar la tasa o
-    #     escribir el monto tal como aparece en el comprobante del cliente.
+    # Sobre eso hay un escape, porque la tasa contable no siempre es la que se le
+    # cobro al cliente en el mostrador: la confirmacion en el POS, donde el cajero
+    # puede cambiar la tasa o escribir el monto tal como aparece en el comprobante.
+    #
+    # Hubo tambien un campo para leer la tasa de un modulo de moneda alterna. Se
+    # quito al comprobar contra uno real (binaural_rate) que esos modulos se
+    # apoyan en las tasas nativas: su `pos.config.foreign_rate` ni siquiera esta
+    # guardado, se calcula al vuelo desde `res.currency.rate`. Daba a elegir entre
+    # el mismo numero por dos caminos. Quien de verdad necesite otra fuente tiene
+    # `_pabilo_conversion_rate`.
 
     def _pabilo_error(self, error_code, message):
         """Fallo con la misma forma que devuelve pabilo.client, para que el POS
@@ -119,10 +107,9 @@ class PosPaymentMethod(models.Model):
         """Tasa nativa de Odoo para pasar `from_currency` a `to_currency`, o 0.0
         si Odoo no la sabe.
 
-        Punto de extension: un modulo que lleve su propia tasa solo tiene que
-        heredar este metodo y devolverla; el resto del flujo sigue igual. Desde el
-        POS se puede apuntar a ella sin escribir codigo, con el campo
-        `pabilo_alt_rate_field`.
+        Punto de extension: un modulo que de verdad lleve su propia tasa, separada
+        de las de Odoo, solo tiene que heredar este metodo y devolverla; el resto
+        del flujo sigue igual.
 
         Devolver 0.0 en vez de dejar que Odoo responda 1.0 es deliberado:
         `_get_rates` hace COALESCE(..., 1.0) cuando no encuentra tasa, asi que
@@ -174,8 +161,7 @@ class PosPaymentMethod(models.Model):
 
         Por orden de prioridad:
           1. lo que confirmo el cajero (`amount_in_bank_currency`)
-          2. una tasa que mando el POS (`alt_rate`): la que el cajero eligio, o la
-             del modulo de moneda alterna
+          2. la tasa que escribio el cajero (`alt_rate`)
           3. la tasa nativa de Odoo
 
         Devuelve un dict con amount, currency, source, rate y error.
@@ -222,9 +208,9 @@ class PosPaymentMethod(models.Model):
         if bank_currency == pos_currency:
             return resultado(amount, 'igual')
 
-        # 3) La tasa que mando el POS, y si no la nativa de Odoo.
+        # 3) La tasa que escribio el cajero, y si no la nativa de Odoo.
         if alt_rate and alt_rate > 0:
-            return resultado(amount * alt_rate, 'alterno', rate=alt_rate)
+            return resultado(amount * alt_rate, 'tasa_elegida', rate=alt_rate)
 
         rate = self._pabilo_conversion_rate(
             pos_currency, bank_currency, fields.Date.context_today(self))
@@ -273,7 +259,7 @@ class PosPaymentMethod(models.Model):
         currency = res['currency']
         pos_currency = (self.env['res.currency'].browse(pos_currency_id).exists()
                         if pos_currency_id else self.env['res.currency'])
-        convertido = res['source'] in ('tasa', 'alterno', 'manual')
+        convertido = res['source'] in ('tasa', 'tasa_elegida', 'manual')
         rate_label = ''
         rate_date = False
         if res['rate'] and pos_currency:
@@ -301,10 +287,9 @@ class PosPaymentMethod(models.Model):
             'line_label': (formatLang(self.env, amount, currency_obj=pos_currency)
                            if pos_currency else ''),
             'converted': convertido,
-            # Ya eligio: no se le vuelve a preguntar lo mismo.
-            'needs_confirm': bool(res['source'] in ('tasa', 'alterno')
-                                  and self.pabilo_amount_confirm
-                                  and amount_in_bank_currency is None),
+            # Solo con la tasa de Odoo hay algo que elegir. Si el cajero ya
+            # escribio una tasa o un monto, no se le repregunta lo mismo.
+            'needs_confirm': bool(res['source'] == 'tasa' and self.pabilo_amount_confirm),
             'source': res['source'],
             'rate': res['rate'],
             'rate_label': rate_label,
@@ -323,8 +308,8 @@ class PosPaymentMethod(models.Model):
         pago del POS. La conversion a la moneda del banco se hace aqui y no en el
         navegador, que no tiene las tasas de Odoo.
 
-        alt_rate: tasa que mando el POS, sea la que eligio el cajero o la del
-        modulo de moneda alterna. Sin ella se usa la de Odoo.
+        alt_rate: tasa que escribio el cajero en el POS. Sin ella se usa la de
+        Odoo.
 
         amount_in_bank_currency: monto que confirmo el cajero. Si llega, se manda
         ese y no se convierte nada.
