@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0-20250909\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-18 16:28+0000\n"
-"PO-Revision-Date: 2026-08-18 16:28+0000\n"
+"POT-Creation-Date: 2026-08-20 17:14+0000\n"
+"PO-Revision-Date: 2026-08-20 17:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -37,10 +37,49 @@ msgid "%s  ·  tasa de Odoo: %s"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "%s archivados por cuentas eliminadas en Pabilo: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "%s métodos de pago creados: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid ""
+"%s métodos que no tenían diario ya lo tienen (sin él el cobro no entraba en "
+"caja): %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "%s no se pudieron ajustar: %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-javascript
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid "%sMonto: %s. Ingrese los últimos 6 dígitos de la referencia."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid ""
+"<b>Crear Métodos de Pago</b> hace uno por cada cuenta de Pabilo,\n"
+"                                        con su propio diario contable, para que cada cobro se asiente en\n"
+"                                        la cuenta que de verdad lo recibió. Solo crea los que falten:\n"
+"                                        no toca los que ya existan, ni sus nombres."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -204,6 +243,11 @@ msgid "Crear Método de Pago"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.res_config_settings_view_form_pabilo
+msgid "Crear Métodos de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__create_uid
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__create_uid
 msgid "Created by"
@@ -240,13 +284,10 @@ msgid "Cuenta Destino"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_account_journal__pabilo_user_bank_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_user_bank_id
-msgid "Cuenta Pabilo"
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
-msgid "Cuenta Pabilo por Defecto"
+msgid "Cuenta Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -264,6 +305,13 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid "Cuenta bancaria destino"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_account_journal__pabilo_user_bank_id
+msgid ""
+"Cuenta de Pabilo cuyos cobros se asientan en este diario. Lo rellena el "
+"módulo al crear el diario; no hace falta tocarlo."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -585,6 +633,11 @@ msgid "Introduce tu appKey de Pabilo para verificar pagos"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_account_journal
+msgid "Journal"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-javascript
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
@@ -594,17 +647,18 @@ msgid ""
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
+msgid ""
+"La cuenta bancaria de Pabilo contra la que este método verifica los pagos. Lo normal es un método por cuenta, con su propio diario, para que cada cobro se asiente donde de verdad entró el dinero: Ajustes → Pabilo → Crear Métodos de Pago los hace todos.\n"
+"\n"
+"Con la cuenta puesta, el POS ya no pregunta a cuál llegó el pago: elegir el método es elegir la cuenta."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_payment_method_wizard__pabilo_user_bank_id
 msgid ""
 "La cuenta bancaria de Pabilo donde se verificarán los pagos recibidos con "
 "este método."
-msgstr ""
-
-#. module: pabilo_payment_gateway
-#: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
-msgid ""
-"La cuenta bancaria de Pabilo donde se verificarán los pagos recibidos en "
-"este POS."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -741,6 +795,32 @@ msgid "Monto que llegó al banco"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__payment_method_ids
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_user_bank_view_form
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_user_bank_view_tree
+msgid "Métodos de Pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#, python-format
+msgid "Métodos de Pago Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "Métodos de Pago de %s"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_user_bank__payment_method_ids
+msgid "Métodos de pago del Punto de Venta que verifican contra esta cuenta."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-python
 #: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
 #: code:addons/pabilo_payment_gateway/models/pos_payment_method.py:0
@@ -755,6 +835,13 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
 #, python-format
 msgid "No hay enlace de pago asociado."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#, python-format
+msgid "No se pudieron crear los métodos"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -780,6 +867,13 @@ msgid "No se pudo conectar con Pabilo. Verifique la URL base y la red."
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid "No se pudo generar un código de diario libre para la cuenta %s."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-javascript
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
@@ -795,6 +889,11 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_user_bank__provider__notification_account
 msgid "Notificación"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__payment_method_count
+msgid "Nº de Métodos"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -949,6 +1048,13 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model,name:pabilo_payment_gateway.model_pos_session
 msgid "Point of Sale Session"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#, python-format
+msgid "Primero falló la sincronización: %s"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1123,6 +1229,14 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_movement_type
 msgid "Tipo de Movimiento"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_user_bank.py:0
+#, python-format
+msgid ""
+"Todas las cuentas ya tenían su método de pago. No hizo falta crear nada."
 msgstr ""
 
 #. module: pabilo_payment_gateway
