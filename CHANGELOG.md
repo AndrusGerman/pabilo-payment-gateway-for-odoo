@@ -4,6 +4,30 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.4.2 / 17.0.2.4.2 — un método borrado ya no deja la caja sin abrir
+
+- **Guarda al restaurar los pedidos guardados.** El POS conserva los pedidos sin
+  pagar en el navegador y los reconstruye al arrancar. `Payment.init_from_JSON`
+  de Odoo hace, sin comprobar nada:
+
+  ```js
+  this.payment_method = this.pos.payment_methods_by_id[json.payment_method_id];
+  this.name = this.payment_method.name;
+  ```
+
+  Si ese método ya no está —lo borraron, lo archivaron o lo quitaron de la
+  caja— eso es `undefined.name`: pantalla roja y **la sesión no abre**. El
+  constructor sí tiene la guarda («Please configure a payment method in your
+  POS»); la ruta de restauración no.
+
+  Con un método de pago por cuenta, ese conjunto cambia más que antes, así que
+  ahora se descarta la línea huérfana y el pedido se abre **sin ella**, con su
+  saldo pendiente. Queda un aviso en la consola con el pedido, el monto y el id
+  del método que falta.
+
+  La guarda es genérica y no solo para Pabilo: cuando el método ya no existe, no
+  hay forma de saber de quién era.
+
 ## 16.0.2.4.1 / 17.0.2.4.1 — los menús dicen que son de Pabilo
 
 - **Nuevo menú «Métodos de Pago Pabilo»** en la app. Antes no había ninguno: para
