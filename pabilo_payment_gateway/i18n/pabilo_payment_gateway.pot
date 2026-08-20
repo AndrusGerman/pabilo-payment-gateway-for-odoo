@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-20 17:15+0000\n"
-"PO-Revision-Date: 2026-08-20 17:15+0000\n"
+"POT-Creation-Date: 2026-08-20 18:07+0000\n"
+"PO-Revision-Date: 2026-08-20 18:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -97,12 +97,8 @@ msgid "Agregar Método Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
-#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_payment_method
-msgid "Agregar Método de Pago"
-msgstr ""
-
-#. module: pabilo_payment_gateway
 #: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_payment_method_wizard
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_payment_method
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_payment_method_wizard_view_form
 msgid "Agregar Método de Pago Pabilo"
 msgstr ""
@@ -283,6 +279,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_account_journal__pabilo_user_bank_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_user_bank_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_pos_payment_method_view_tree
 msgid "Cuenta Pabilo"
 msgstr ""
 
@@ -319,7 +316,7 @@ msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_user_bank
-msgid "Cuentas Bancarias"
+msgid "Cuentas Bancarias Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -352,6 +349,13 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__name
 msgid "Descripción"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_payment_methods
+msgid ""
+"Desde aquí puedes renombrarlos y archivarlos: es tu configuración de Odoo\n"
+"                y no toca nada en Pabilo."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -597,6 +601,14 @@ msgid ""
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_payment_methods
+msgid ""
+"Haz uno por cada cuenta bancaria, con su propio diario contable, desde\n"
+"                <b>Ajustes → Pabilo → Crear Métodos de Pago</b>. Así cada cobro se asienta\n"
+"                en la cuenta que de verdad lo recibió."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__id
 msgid "ID"
@@ -813,6 +825,9 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #. odoo-python
 #: code:addons/pabilo_payment_gateway/models/res_config_settings.py:0
+#: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_payment_methods
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_payment_methods
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_pos_payment_method_view_tree
 #, python-format
 msgid "Métodos de Pago Pabilo"
 msgstr ""
@@ -1246,6 +1261,11 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_user_bank
 msgid "Todavía no hay cuentas sincronizadas"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_payment_methods
+msgid "Todavía no hay métodos de pago Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
