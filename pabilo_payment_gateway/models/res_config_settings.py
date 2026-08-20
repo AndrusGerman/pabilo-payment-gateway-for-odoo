@@ -42,3 +42,40 @@ class ResConfigSettings(models.TransientModel):
                 'type': 'success' if ok else 'warning',
             }
         }
+
+    def action_pabilo_create_payment_methods(self):
+        """Crea un método de pago del POS por cada cuenta de Pabilo.
+
+        Va detrás de una sincronización, para no crear métodos a partir de un
+        espejo viejo. Es explícito y no automático a propósito: crear diarios es
+        tocar contabilidad, y eso no debe pasar en un cron ni a media venta.
+        """
+        self.ensure_one()
+        self.execute()
+        ok, sync_message = self.env['pabilo.user.bank'].action_sync_banks()
+        if not ok:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('No se pudieron crear los métodos'),
+                    'message': _('Primero falló la sincronización: %s', sync_message),
+                    'sticky': True,
+                    'type': 'warning',
+                }
+            }
+
+        creados, archivados, bloqueados, message = (
+            self.env['pabilo.user.bank'].action_create_payment_methods())
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Métodos de Pago Pabilo'),
+                'message': message,
+                # Si algo quedó bloqueado el aviso se queda fijo: es lo único
+                # que exige una acción del administrador.
+                'sticky': bool(bloqueados),
+                'type': 'warning' if bloqueados else 'success',
+            }
+        }

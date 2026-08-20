@@ -31,6 +31,12 @@
                                     string="Sincronizar Cuentas Pabilo"
                                     class="btn-secondary" icon="fa-refresh"/>
                         </setting>
+                        <setting string="Métodos de pago"
+                                 help="Hace un método de pago por cada cuenta de Pabilo, con su propio diario contable, para que cada cobro se asiente en la cuenta que de verdad lo recibió. Solo crea los que falten: no toca los que ya existan, ni sus nombres.">
+                            <button name="action_pabilo_create_payment_methods" type="object"
+                                    string="Crear Métodos de Pago"
+                                    class="btn-secondary" icon="fa-credit-card"/>
+                        </setting>
                     </block>
                 </app>
             </xpath>

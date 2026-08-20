@@ -66,6 +66,16 @@ class PabiloUserBank(models.Model):
              'Es contra esta moneda que Pabilo compara el monto al verificar un '
              'pago, sin importar en que moneda cobre el POS.',
     )
+    # Relacion inversa, no un campo propio: el espejo es de solo lectura y un
+    # Many2one aqui habria que escribirlo bajo el contexto de sincronizacion.
+    # El dato vive donde importa, en el metodo de pago.
+    payment_method_ids = fields.One2many(
+        'pos.payment.method', 'pabilo_user_bank_id',
+        string='Métodos de Pago',
+        help='Métodos de pago del Punto de Venta que verifican contra esta cuenta.',
+    )
+    payment_method_count = fields.Integer(
+        string='Nº de Métodos', compute='_compute_payment_method_count')
 
     _sql_constraints = [
         ('pabilo_id_company_uniq',
@@ -104,6 +114,216 @@ class PabiloUserBank(models.Model):
                         break
                 cache[names] = found
             rec.currency_id = cache[names]
+
+    def _compute_payment_method_count(self):
+        # active_test=False: un metodo archivado sigue contando, porque es el que
+        # explica por que el boton no vuelve a crear uno para esta cuenta.
+        for rec in self:
+            rec.payment_method_count = self.env['pos.payment.method'].with_context(
+                active_test=False).search_count([('pabilo_user_bank_id', '=', rec.id)])
+
+    # -- Un metodo de pago (y un diario) por cuenta ------------------------
+    #
+    # Un solo metodo de pago para varias cuentas descuadra la contabilidad: el
+    # cajero elige a que cuenta llego el dinero, pero el asiento va al diario
+    # fijo del metodo, asi que un cobro que entro al BDV termina asentado en el
+    # de Binance. El dinero se verifica bien y se contabiliza mal.
+    #
+    # Con un metodo por cuenta, elegir el metodo ya es elegir la cuenta, y las
+    # dos cosas dejan de poder separarse.
+    #
+    # Nada de esto corre solo: lo dispara un boton en Ajustes. Crear diarios es
+    # tocar contabilidad, y eso no puede pasar en el cron de madrugada ni a
+    # media venta.
+
+    def _pabilo_journal_code(self):
+        """Codigo corto y unico para el diario de esta cuenta.
+
+        `account.journal.code` son 5 caracteres y unico por compania
+        (`code_company_uniq`), asi que hace falta resolver colisiones: dos
+        cuentas distintas pueden terminar en los mismos 4 digitos.
+        """
+        self.ensure_one()
+        sufijo = ''.join(c for c in (self.account_number or '') if c.isalnum())[-4:]
+        if not sufijo:
+            sufijo = (self.pabilo_id or '')[-4:] or 'BANK'
+        base = ('P%s' % sufijo.upper())[:5]
+
+        Journal = self.env['account.journal'].with_context(active_test=False)
+        dominio = [('company_id', '=', self.company_id.id)]
+        if not Journal.search_count(dominio + [('code', '=', base)]):
+            return base
+        for i in range(2, 100):
+            cola = str(i)
+            candidato = base[:5 - len(cola)] + cola
+            if not Journal.search_count(dominio + [('code', '=', candidato)]):
+                return candidato
+        raise UserError(_(
+            'No se pudo generar un código de diario libre para la cuenta %s.',
+            self.display_name))
+
+    def _pabilo_short_label(self):
+        """"Mi cuenta binance (0001)": la descripcion y los ultimos digitos.
+
+        Es como el contable y el cajero reconocen la cuenta. Se evita
+        `display_name` porque antepone el proveedor, que a menudo repite la
+        descripcion.
+        """
+        self.ensure_one()
+        etiqueta = self.name or self.display_name or self.pabilo_id
+        digitos = (self.account_number or '')[-4:]
+        return '%s (%s)' % (etiqueta, digitos) if digitos else etiqueta
+
+    def _pabilo_journal_name(self):
+        self.ensure_one()
+        return ('Pabilo - %s' % self._pabilo_short_label())[:64]
+
+    def _pabilo_ensure_journal(self):
+        """Diario de esta cuenta, creandolo si no existe.
+
+        Se crea **sin moneda**, o sea en la de la compania, y no en la del banco.
+        Es deliberado: `pos.config._check_payment_method_ids` rechaza un metodo
+        de pago cuyo diario tenga una moneda distinta a la del TPV, asi que un
+        diario en bolivares no se podria ni agregar a una caja que cobra en
+        dolares. Y es lo correcto: `pos.payment.amount` esta en moneda del TPV;
+        los bolivares solo se usan para buscar el movimiento en el banco.
+        """
+        self.ensure_one()
+        Journal = self.env['account.journal']
+        existente = Journal.search([
+            ('company_id', '=', self.company_id.id),
+            ('pabilo_user_bank_id', '=', self.id),
+        ], limit=1)
+        if existente:
+            return existente
+        return Journal.create({
+            # `display_name` no sirve aqui: repite el proveedor, que muchas veces
+            # es igual a la descripcion ("Pabilo - BDV Personal - BDV Personal -
+            # (4041)"). El contable necesita la descripcion y los ultimos digitos,
+            # que es como identifica la cuenta en su extracto.
+            'name': self._pabilo_journal_name(),
+            'code': self._pabilo_journal_code(),
+            'type': 'bank',
+            'currency_id': False,
+            'company_id': self.company_id.id,
+            'pabilo_user_bank_id': self.id,
+        })
+
+    def _pabilo_method_name(self):
+        """Nombre del metodo: "Pabilo - Mi cuenta binance"."""
+        self.ensure_one()
+        base = 'Pabilo - %s' % (self.name or self.display_name or self.pabilo_id)
+        Method = self.env['pos.payment.method'].with_context(active_test=False)
+        if not Method.search_count([('name', '=', base),
+                                    ('company_id', '=', self.company_id.id)]):
+            return base
+        # Dos cuentas con la misma descripcion en Pabilo: se desambigua con los
+        # ultimos digitos, que es lo que el cajero reconoce.
+        return '%s (%s)' % (base, (self.account_number or self.pabilo_id)[-4:])
+
+    def _pabilo_ensure_payment_method(self):
+        """Metodo de pago de esta cuenta. Devuelve (metodo, creado).
+
+        Si la cuenta ya tiene uno **no se toca nada**: asi sobreviven los
+        renombres del cliente sin necesidad de ninguna marca, y de paso se
+        esquiva `_is_write_forbidden`, que prohibe escribir en un metodo de pago
+        con sesiones POS abiertas. Solo se crea, nunca se reescribe.
+        """
+        self.ensure_one()
+        Method = self.env['pos.payment.method'].with_context(active_test=False)
+        existente = Method.search([('pabilo_user_bank_id', '=', self.id)], limit=1)
+        if existente:
+            return existente, False
+        metodo = self.env['pos.payment.method'].create({
+            'name': self._pabilo_method_name(),
+            'use_payment_terminal': 'pabilo',
+            'pabilo_user_bank_id': self.id,
+            'journal_id': self._pabilo_ensure_journal().id,
+            'company_id': self.company_id.id,
+        })
+        return metodo, True
+
+    @api.model
+    def action_create_payment_methods(self):
+        """Crea el metodo de pago que falte para cada cuenta de la compania.
+
+        Devuelve (creados, archivados, bloqueados, mensaje). Nunca lanza: lo
+        llama un boton de Ajustes y un fallo parcial tiene que poder contarse.
+        """
+        company = self.env.company
+        creados, arreglados, archivados, bloqueados = [], [], [], []
+
+        for cuenta in self.search([('company_id', '=', company.id),
+                                   ('is_trashed', '=', False)]):
+            try:
+                metodo, nuevo = cuenta._pabilo_ensure_payment_method()
+            except Exception as e:
+                _logger.exception("Pabilo: no se pudo crear el metodo de %s", cuenta.display_name)
+                bloqueados.append('%s (%s)' % (cuenta.display_name, e))
+                continue
+            if nuevo:
+                creados.append(metodo.name)
+                continue
+            # Metodo que ya existia sin diario: sin el, Odoo lo trata como
+            # «pagar despues» y el cobro no entra en caja. No es pisarle la
+            # configuracion al cliente, es rellenar lo que esta vacio y roto.
+            # Es el caso de quien venia de una version anterior y la migracion
+            # no pudo arreglar por tener la caja abierta.
+            if not metodo.journal_id:
+                try:
+                    metodo.journal_id = cuenta._pabilo_ensure_journal()
+                    arreglados.append(metodo.name)
+                except UserError as e:
+                    bloqueados.append('%s (%s)' % (metodo.name, e))
+
+        # Cuentas que ya no existen en Pabilo: su metodo se archiva, nunca se
+        # borra. Hay `pos.payment` historicos apuntando ahi y borrarlo dejaria
+        # ventas viejas sin metodo de pago.
+        eliminadas = self.search([('company_id', '=', company.id), ('is_trashed', '=', True)])
+        vivos = self.env['pos.payment.method'].search([
+            ('pabilo_user_bank_id', 'in', eliminadas.ids)])
+        for metodo in vivos:
+            try:
+                metodo.active = False
+                archivados.append(metodo.name)
+            except UserError as e:
+                # Sesion POS abierta: Odoo prohibe tocar el metodo. Se informa,
+                # no se rompe el boton por esto.
+                bloqueados.append('%s (%s)' % (metodo.name, e))
+
+        partes = []
+        if creados:
+            partes.append(_('%s métodos de pago creados: %s',
+                            len(creados), ', '.join(creados)))
+        if arreglados:
+            partes.append(_('%s métodos que no tenían diario ya lo tienen (sin él '
+                            'el cobro no entraba en caja): %s',
+                            len(arreglados), ', '.join(arreglados)))
+        if archivados:
+            partes.append(_('%s archivados por cuentas eliminadas en Pabilo: %s',
+                            len(archivados), ', '.join(archivados)))
+        if bloqueados:
+            partes.append(_('%s no se pudieron ajustar: %s',
+                            len(bloqueados), '; '.join(bloqueados)))
+        if not partes:
+            partes.append(_('Todas las cuentas ya tenían su método de pago. '
+                            'No hizo falta crear nada.'))
+
+        mensaje = '\n'.join(partes)
+        _logger.info("Pabilo: %s", mensaje.replace('\n', ' | '))
+        return len(creados) + len(arreglados), len(archivados), len(bloqueados), mensaje
+
+    def action_view_payment_methods(self):
+        """Botón inteligente de la ficha de la cuenta."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Métodos de Pago de %s', self.display_name),
+            'res_model': 'pos.payment.method',
+            'view_mode': 'tree,form',
+            'domain': [('pabilo_user_bank_id', '=', self.id)],
+            'context': {'active_test': False},
+        }
 
     # -- Solo lectura -----------------------------------------------------
     # La ACL ya niega write/create/unlink a todos los grupos, pero eso lo

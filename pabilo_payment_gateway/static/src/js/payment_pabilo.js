@@ -229,29 +229,38 @@ export class PaymentPabilo extends PaymentInterface {
             : null;
         let bankLabel = this.payment_method.pabilo_account_hint || "";
 
-        const accounts = await this._fetch_accounts();
-        if (this._pabilo_cancelled) {
-            return false;
-        }
-        if (accounts.length > 1) {
-            const { confirmed, payload: account } = await this.popup.add(SelectionPopup, {
-                title: _t("Cuenta bancaria destino"),
-                body: _t("¿A cuál de estas cuentas envió el cliente el pago?"),
-                list: accounts.map((acc) => ({
-                    id: acc.id,
-                    label: acc.display_name,
-                    isSelected: acc.id === bankId,
-                    item: acc,
-                })),
-            });
-            if (this._pabilo_cancelled || !confirmed || !account) {
+        // Con la cuenta puesta en el metodo no se pregunta nada: elegir el metodo
+        // ya fue elegir la cuenta, y su diario contable es el de esa cuenta.
+        // Preguntar aqui es lo que permitia verificar contra un banco y asentar
+        // el cobro en otro.
+        //
+        // El selector queda solo para un metodo sin cuenta configurada:
+        // instalaciones que aun no pulsaron «Crear Metodos de Pago».
+        if (!bankId) {
+            const accounts = await this._fetch_accounts();
+            if (this._pabilo_cancelled) {
                 return false;
             }
-            bankId = account.id;
-            bankLabel = account.display_name;
-        } else if (accounts.length === 1) {
-            bankId = accounts[0].id;
-            bankLabel = accounts[0].display_name;
+            if (accounts.length > 1) {
+                const { confirmed, payload: account } = await this.popup.add(SelectionPopup, {
+                    title: _t("Cuenta bancaria destino"),
+                    body: _t("¿A cuál de estas cuentas envió el cliente el pago?"),
+                    list: accounts.map((acc) => ({
+                        id: acc.id,
+                        label: acc.display_name,
+                        isSelected: acc.id === bankId,
+                        item: acc,
+                    })),
+                });
+                if (this._pabilo_cancelled || !confirmed || !account) {
+                    return false;
+                }
+                bankId = account.id;
+                bankLabel = account.display_name;
+            } else if (accounts.length === 1) {
+                bankId = accounts[0].id;
+                bankLabel = accounts[0].display_name;
+            }
         }
 
         const accountHint = bankLabel ? _t("Cuenta destino: %s. ", bankLabel) : "";

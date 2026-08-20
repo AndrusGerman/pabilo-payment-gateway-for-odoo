@@ -14,8 +14,13 @@ class PosPaymentMethod(models.Model):
 
     pabilo_user_bank_id = fields.Many2one(
         'pabilo.user.bank',
-        string='Cuenta Pabilo por Defecto',
-        help='La cuenta bancaria de Pabilo donde se verificarán los pagos recibidos en este POS.'
+        string='Cuenta Pabilo',
+        help='La cuenta bancaria de Pabilo contra la que este método verifica los '
+             'pagos. Lo normal es un método por cuenta, con su propio diario, '
+             'para que cada cobro se asiente donde de verdad entró el dinero: '
+             'Ajustes → Pabilo → Crear Métodos de Pago los hace todos.\n\n'
+             'Con la cuenta puesta, el POS ya no pregunta a cuál llegó el pago: '
+             'elegir el método es elegir la cuenta.'
     )
     pabilo_account_hint = fields.Char(
         string='Cuenta Destino',
