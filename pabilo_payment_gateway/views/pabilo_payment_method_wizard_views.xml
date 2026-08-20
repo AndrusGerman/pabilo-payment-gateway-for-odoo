@@ -37,7 +37,7 @@
          que sí trae la 17. Un botón que crea un registro nuevo no tiene nada
          que seleccionar, así que aquí el acceso es únicamente por el menú. -->
     <menuitem id="menu_pabilo_payment_method"
-              name="Agregar Método de Pago"
+              name="Agregar Método de Pago Pabilo"
               parent="menu_pabilo_root"
               sequence="7"
               groups="point_of_sale.group_pos_manager"

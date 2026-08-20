@@ -1,6 +1,6 @@
 {
     'name': 'Pabilo Payment Gateway for Odoo',
-    'version': '16.0.2.4.0',
+    'version': '16.0.2.4.1',
     'summary': 'Verifica pagos móviles, transferencias y Binance en el POS con Pabilo',
     'description': """
 Pabilo Payment Gateway
