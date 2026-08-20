@@ -38,6 +38,13 @@
                                     </div>
                                     <div class="mt16">
                                         <button name="action_pabilo_sync_banks" type="object" string="Sincronizar Cuentas Pabilo" class="btn-secondary" icon="fa-refresh"/>
+                                        <button name="action_pabilo_create_payment_methods" type="object" string="Crear Métodos de Pago" class="btn-secondary ms-2" icon="fa-credit-card"/>
+                                    </div>
+                                    <div class="text-muted mt8">
+                                        <b>Crear Métodos de Pago</b> hace uno por cada cuenta de Pabilo,
+                                        con su propio diario contable, para que cada cobro se asiente en
+                                        la cuenta que de verdad lo recibió. Solo crea los que falten:
+                                        no toca los que ya existan, ni sus nombres.
                                     </div>
                                 </div>
                             </div>

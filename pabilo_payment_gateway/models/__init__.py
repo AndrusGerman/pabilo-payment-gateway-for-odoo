@@ -1,6 +1,7 @@
 from . import pabilo_client
 from . import res_company
 from . import res_config_settings
+from . import account_journal
 from . import pabilo_user_bank
 from . import payment_provider
 from . import payment_transaction

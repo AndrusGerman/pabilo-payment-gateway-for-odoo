@@ -34,7 +34,7 @@ indica otro servidor.
 | `models/pos_payment_method.py` | Métodos RPC que llama el POS: `pabilo_verify_payment`, `pabilo_amount_preview` y la resolución del monto en la moneda del banco. |
 | `static/src/js/payment_pabilo.js` | `PaymentInterface` del POS: teclado numérico, fecha del pago y selección de cuenta. |
 | `static/src/js/models.js` | `register_payment_method('pabilo', …)` y serialización de los campos en la línea de pago. |
-| `models/pabilo_user_bank.py` | Espejo **de solo lectura** de las cuentas de Pabilo. |
+| `models/pabilo_user_bank.py` | Espejo **de solo lectura** de las cuentas de Pabilo, y la creación de un método de pago y un diario por cada una. |
 
 El navegador nunca ve el appKey: el JS llama a Odoo por RPC y es el servidor
 quien habla con Pabilo.
@@ -94,6 +94,56 @@ cada cuenta de Pabilo. No hay que escribirlo.
 Requisito de despliegue: el `dbfilter` de Odoo debe resolver a **una sola base**.
 Si coincide con varias, Odoo no sabe cuál usar en una ruta pública y responde 404
 en lugar de procesar el webhook.
+
+## Un método de pago por cuenta
+
+Pabilo verifica contra una cuenta bancaria concreta, y en Odoo cada cobro se
+asienta en el **diario** del método de pago. Si un mismo método sirve para varias
+cuentas, esas dos cosas se separan: el cajero dice que el dinero llegó al BDV y
+el asiento va al diario de Binance. Se verifica bien y se contabiliza mal.
+
+Por eso el modelo es **una cuenta, un método, un diario**.
+
+### Cómo se crean
+
+**Ajustes → Pabilo → Crear Métodos de Pago.** Sincroniza las cuentas y crea un
+`pos.payment.method` por cada una, llamado `Pabilo - <cuenta>`, con un diario de
+banco propio.
+
+Es un botón y no algo automático a propósito: crear diarios es tocar
+contabilidad, y eso no debe pasar en el cron de madrugada ni a media venta.
+
+Después hay que **añadir los métodos a cada TPV** que los vaya a usar
+(Punto de Venta → Configuración → Punto de Venta). El botón no los agrega solo:
+cambiar la pantalla de cobro sin que nadie lo pida es peor que un paso de más.
+
+### Qué respeta
+
+- **Los nombres.** El botón solo crea lo que falta; si la cuenta ya tiene método,
+  no lo toca. Rename libre desde Odoo.
+- **Lo que ya funciona.** No reasigna diarios ya puestos. Sí rellena el diario
+  cuando está **vacío**, porque sin él Odoo trata el método como «pagar
+  después» y el cobro no entra en caja.
+- **El histórico.** Una cuenta eliminada en Pabilo archiva su método, no lo
+  borra: hay `pos.payment` viejos apuntando ahí.
+
+Activar y desactivar es el archivado nativo de Odoo, y no tiene ninguna relación
+con la API: archivar un método aquí no toca la cuenta en Pabilo.
+
+### Por qué los diarios no llevan moneda
+
+Se crean **sin moneda**, o sea en la de la compañía, aunque el banco registre en
+bolívares. `pos.config._check_payment_method_ids` rechaza un método cuyo diario
+tenga una moneda distinta a la del TPV, así que un diario en bolívares no se
+podría ni agregar a una caja que cobra en dólares. Y es lo correcto:
+`pos.payment.amount` está en moneda del TPV; los bolívares solo se usan para
+buscar el movimiento en el banco (ver **Multi-moneda**).
+
+### En el POS
+
+Con la cuenta puesta en el método, **el POS ya no pregunta** a cuál llegó el
+pago: elegir el método fue elegir la cuenta. El selector queda solo como
+respaldo para un método sin cuenta configurada.
 
 ## Multi-moneda
 

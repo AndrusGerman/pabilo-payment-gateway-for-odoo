@@ -38,11 +38,16 @@ class PabiloPaymentMethodWizard(models.TransientModel):
     def action_confirm(self):
         """Crea el método de pago POS ya configurado para Pabilo y lo abre."""
         self.ensure_one()
+        # Sin diario, Odoo trata el método como «pagar después» y el cobro no
+        # entra en caja. Si no se eligió uno, se usa el de la cuenta —el mismo
+        # que crea el botón de Ajustes—, así este atajo no deja un método a
+        # medio configurar.
+        journal = self.journal_id or self.pabilo_user_bank_id._pabilo_ensure_journal()
         method = self.env['pos.payment.method'].create({
             'name': self.name,
             'use_payment_terminal': 'pabilo',
             'pabilo_user_bank_id': self.pabilo_user_bank_id.id,
-            'journal_id': self.journal_id.id or False,
+            'journal_id': journal.id,
             'company_id': self.company_id.id,
         })
         return {

@@ -4,6 +4,44 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.4.0 / 17.0.2.4.0 — un método de pago (y un diario) por cuenta
+
+Un solo método de pago para varias cuentas descuadraba la contabilidad. El
+cajero elegía en un popup a qué cuenta había llegado el dinero, pero el
+asiento iba al **diario fijo del método**: un cobro que entró al BDV terminaba
+asentado en el de Binance. Se verificaba bien y se contabilizaba mal.
+
+- **Ajustes → Pabilo → Crear Métodos de Pago** hace un `pos.payment.method` por
+  cada cuenta sincronizada —`Pabilo - Mi cuenta binance`— con **su propio
+  diario de banco**. Elegir el método pasa a ser elegir la cuenta, y las dos
+  cosas dejan de poder separarse.
+- **El POS ya no pregunta a qué cuenta llegó el pago** cuando el método trae la
+  suya. El selector queda solo para un método sin cuenta configurada.
+- **Los diarios se crean sin moneda**, o sea en la de la compañía.
+  `pos.config._check_payment_method_ids` rechaza un método cuyo diario tenga otra
+  moneda que el TPV, así que un diario en bolívares no se podría ni agregar a una
+  caja en dólares. Y es lo correcto: `pos.payment.amount` está en moneda del TPV;
+  los bolívares solo sirven para buscar el movimiento en el banco.
+- **No se pisa nada de lo que ya exista.** El botón solo crea lo que falta, así
+  que los renombres del cliente sobreviven sin necesidad de ninguna marca —y de
+  paso se esquiva `_is_write_forbidden`, que prohíbe escribir en un método con
+  sesiones POS abiertas.
+- **Sí rellena el diario que falte** en métodos que ya estaban en uso. Sin diario
+  Odoo los trata como «pagar después» y el cobro no entra en caja: no es
+  configuración del cliente, es un campo vacío y roto.
+- **Las cuentas eliminadas en Pabilo archivan su método**, nunca lo borran: hay
+  `pos.payment` históricos apuntando ahí.
+- **`account.journal.pabilo_user_bank_id`** deja dicho de qué cuenta salió cada
+  diario. Hace la operación idempotente y le dice al contable qué banco real hay
+  detrás.
+- **Migración `16.0.2.4.0`**, conservadora a propósito: no crea métodos ni
+  renombra nada —eso es cosa del botón—. Intenta rellenar el diario de los
+  métodos en uso y, si hay sesiones abiertas, lo deja dicho en el log con la ruta
+  exacta en vez de reventar el arranque.
+
+El asistente **Agregar Método de Pago** también usa ahora el diario de la cuenta
+cuando no se le indica uno, para no dejar métodos a medio configurar.
+
 ## 16.0.2.3.2 / 17.0.2.3.2 — una sola tasa
 
 - **Fuera `pabilo_alt_rate_field`.** El campo salió de suponer que un módulo de

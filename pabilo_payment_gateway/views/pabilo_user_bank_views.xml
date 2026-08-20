@@ -9,6 +9,7 @@
                 <field name="provider"/>
                 <field name="account_number"/>
                 <field name="currency_id"/>
+                <field name="payment_method_count" string="Métodos de Pago"/>
                 <field name="supports_payment_link"/>
                 <field name="is_trashed"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -22,6 +23,13 @@
         <field name="arch" type="xml">
             <form create="false" edit="false" delete="false">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payment_methods" type="object"
+                                class="oe_stat_button" icon="fa-credit-card">
+                            <field name="payment_method_count" widget="statinfo"
+                                   string="Métodos de Pago"/>
+                        </button>
+                    </div>
                     <div class="alert alert-info" role="alert">
                         Estas cuentas son un espejo de solo lectura de Pabilo.
                         Para modificarlas, edítalas en Pabilo y luego pulsa
