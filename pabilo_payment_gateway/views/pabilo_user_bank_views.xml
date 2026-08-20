@@ -70,8 +70,11 @@
         </field>
     </record>
 
+    <!-- El nombre repite "Pabilo" aunque el menú ya viva dentro de la app: el
+         buscador de comandos (Ctrl+K) lista los menús sin su aplicación, y ahí
+         "Cuentas Bancarias" se confunde con las de Contactos y Contabilidad. -->
     <menuitem id="menu_pabilo_user_bank"
-              name="Cuentas Bancarias"
+              name="Cuentas Bancarias Pabilo"
               parent="menu_pabilo_root"
               sequence="5"
               action="action_pabilo_user_bank"/>

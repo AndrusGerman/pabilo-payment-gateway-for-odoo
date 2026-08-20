@@ -4,6 +4,20 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.4.1 / 17.0.2.4.1 — los menús dicen que son de Pabilo
+
+- **Nuevo menú «Métodos de Pago Pabilo»** en la app. Antes no había ninguno: para
+  ver los métodos había que ir a la acción genérica de Odoo, que lista **todos**
+  los del POS —los de Pabilo y los que no— y con su propio nombre en el
+  breadcrumb («Settings / Payments Methods»). El menú nuevo filtra por
+  `use_payment_terminal = 'pabilo'` y trae una lista con la cuenta y el diario de
+  cada uno a la vista.
+- **«Cuentas Bancarias» → «Cuentas Bancarias Pabilo»** y **«Agregar Método de
+  Pago» → «Agregar Método de Pago Pabilo».** Repetir el nombre de la app parece
+  redundante, pero el buscador de comandos (Ctrl+K) lista los menús sin su
+  aplicación, y ahí «Cuentas Bancarias» se confunde con las de Contactos y
+  Contabilidad. Antes solo se sabía que era de Pabilo al abrir el diálogo.
+
 ## 16.0.2.4.0 / 17.0.2.4.0 — un método de pago (y un diario) por cuenta
 
 Un solo método de pago para varias cuentas descuadraba la contabilidad. El

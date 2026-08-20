@@ -16,4 +16,50 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Listado propio en vez de mandar a la acción genérica de Odoo, que
+         muestra todos los métodos de pago del POS —los de Pabilo y los que no—
+         y con su propio nombre en el breadcrumb. Aquí solo salen los de Pabilo
+         y se lee de dónde vienen. -->
+    <record id="pabilo_pos_payment_method_view_tree" model="ir.ui.view">
+        <field name="name">pos.payment.method.tree.pabilo</field>
+        <field name="model">pos.payment.method</field>
+        <field name="arch" type="xml">
+            <tree string="Métodos de Pago Pabilo">
+                <field name="name"/>
+                <field name="pabilo_user_bank_id" string="Cuenta Pabilo"/>
+                <field name="journal_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_pabilo_payment_methods" model="ir.actions.act_window">
+        <field name="name">Métodos de Pago Pabilo</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pos.payment.method</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="pabilo_pos_payment_method_view_tree"/>
+        <field name="domain">[('use_payment_terminal', '=', 'pabilo')]</field>
+        <field name="context">{'default_use_payment_terminal': 'pabilo'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Todavía no hay métodos de pago Pabilo</p>
+            <p>
+                Haz uno por cada cuenta bancaria, con su propio diario contable, desde
+                <b>Ajustes → Pabilo → Crear Métodos de Pago</b>. Así cada cobro se asienta
+                en la cuenta que de verdad lo recibió.
+            </p>
+            <p>
+                Desde aquí puedes renombrarlos y archivarlos: es tu configuración de Odoo
+                y no toca nada en Pabilo.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_pabilo_payment_methods"
+              name="Métodos de Pago Pabilo"
+              parent="menu_pabilo_root"
+              sequence="6"
+              groups="point_of_sale.group_pos_manager"
+              action="action_pabilo_payment_methods"/>
 </odoo>

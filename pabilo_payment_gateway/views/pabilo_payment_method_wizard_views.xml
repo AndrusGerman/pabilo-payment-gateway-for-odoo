@@ -57,7 +57,7 @@
     <!-- El asistente tambien vive en el menu de Pabilo: es el unico acceso que
          funciona igual en 16 y 17, y no depende de estar en la lista correcta. -->
     <menuitem id="menu_pabilo_payment_method"
-              name="Agregar Método de Pago"
+              name="Agregar Método de Pago Pabilo"
               parent="menu_pabilo_root"
               sequence="7"
               groups="point_of_sale.group_pos_manager"
