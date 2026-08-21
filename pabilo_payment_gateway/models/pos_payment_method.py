@@ -192,7 +192,14 @@ class PosPaymentMethod(models.Model):
         #    decide el monto de la linea, y quien valida de verdad es Pabilo
         #    contra el movimiento del banco. Un numero equivocado se rechaza.
         if amount_in_bank_currency is not None:
-            return resultado(amount_in_bank_currency, 'manual')
+            # Se guarda igual una tasa de referencia: hace falta para poder llevar
+            # ese monto de vuelta a la moneda del POS y fijar la linea de pago.
+            referencia = alt_rate if (alt_rate and alt_rate > 0) else 0.0
+            if not referencia and pos_currency and bank_currency \
+                    and bank_currency != pos_currency:
+                referencia = self._pabilo_conversion_rate(
+                    pos_currency, bank_currency, fields.Date.context_today(self))
+            return resultado(amount_in_bank_currency, 'manual', rate=referencia)
 
         if not pos_currency:
             # Llamada sin moneda de origen: JS viejo en cache tras actualizar el
@@ -247,7 +254,7 @@ class PosPaymentMethod(models.Model):
         base = {'error_code': '', 'message': '', 'amount': amount, 'currency_name': '',
                 'label': '', 'converted': False, 'needs_confirm': False,
                 'source': '', 'rate': 0.0, 'line_label': '', 'pos_currency_name': '',
-                'rate_label': '', 'rate_date': ''}
+                'rate_label': '', 'rate_date': '', 'pos_amount': 0.0}
 
         user_bank = self._pabilo_resolve_user_bank(user_bank_id)
         if not user_bank:
@@ -299,7 +306,30 @@ class PosPaymentMethod(models.Model):
             'rate': res['rate'],
             'rate_label': rate_label,
             'rate_date': fields.Date.to_string(rate_date) if rate_date else '',
+            # Ese mismo monto, de vuelta en la moneda del POS. Es lo que el POS
+            # pone en la linea de pago, y sin esto el cobro parcial es imposible:
+            # el teclado del POS recorta lo que se escribe al saldo pendiente **en
+            # la moneda del POS** (NumberBuffer, maxValue = get_due()), mientras
+            # que el cajero teclea bolivares. Cualquier cifra en bolivares supera
+            # ese tope, se recorta al total exacto, y la venta se cierra como
+            # pagada completa. Diciendole nosotros el monto de la linea, el teclado
+            # deja de estorbar.
+            'pos_amount': self._pabilo_amount_in_pos_currency(res, pos_currency),
         }
+
+    def _pabilo_amount_in_pos_currency(self, res, pos_currency):
+        """Lleva el monto ya resuelto de vuelta a la moneda del POS.
+
+        Devuelve 0.0 cuando no hay nada que llevar de vuelta —misma moneda, o sin
+        tasa con la que dividir—, y el POS lo interpreta como «no toques la linea».
+        """
+        self.ensure_one()
+        if not pos_currency or res['currency'] == pos_currency:
+            return 0.0
+        if not res['rate']:
+            return 0.0
+        return float_round(res['amount'] / res['rate'],
+                           precision_rounding=pos_currency.rounding)
 
     def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None,
                               fecha_pago=None, pos_currency_id=None, alt_rate=None,

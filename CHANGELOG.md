@@ -4,6 +4,45 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.6.0 — el cobro parcial en otra moneda ya es posible
+
+Con el banco cobrando en otra moneda que el POS, **un pago parcial cerraba la
+venta como pagada completa**. Reportado desde el POS del cliente: una venta de
+0,18 $ (138,80 Bs) quedaba en «Restantes 0,00» tras intentar abonar una parte.
+
+No era un bug de un solo módulo, sino de tres piezas que solas están bien:
+
+1. **Odoo core**: si la caja no tiene método de efectivo, limita el teclado al
+   saldo pendiente **en la moneda del POS** (`maxValue = get_due()`).
+2. **`NumberBuffer`** recorta en silencio lo tecleado a ese tope
+   (`NumberBuffer.js:301`).
+3. La **moneda alterna** de la localización muestra el total en bolívares, así
+   que el cajero teclea bolívares.
+
+Cualquier cifra en bolívares supera un tope expresado en dólares, se recorta al
+total exacto, y la venta se cierra. Por eso con Binance —misma moneda que el
+POS— sí funcionaba. Y agregar un método de efectivo lo empeora: sin tope,
+teclear 100 pensando en bolívares cobra **100 dólares**.
+
+- **El monto que el cajero confirma ahora manda sobre la línea de pago.** Dice
+  cuánto llegó al banco y la línea queda en su equivalente, así que el teclado
+  deja de estorbar porque ya no se usa para esto. Con 10,00 Bs de total y 5,00 Bs
+  abonados, la línea queda en 1,00 $ y el restante en 1,00 $.
+- **`pabilo_amount_preview` devuelve `pos_amount`**: el equivalente ya convertido
+  y redondeado con la precisión de la moneda del POS. La división se hace en el
+  servidor, no en el navegador.
+- **Solo actúa cuando hubo conversión.** Si la moneda del POS ya es la del banco
+  —Binance en USD sobre una caja en USD— devuelve `pos_amount = 0` y el POS no
+  toca la línea.
+
+Efecto secundario a tener en cuenta: al fijar nosotros el monto se salta el tope
+de Odoo, así que si el cajero declara más de lo que vale la venta, el exceso lo
+trata Odoo como vuelto.
+
+> **Nota de ramas:** esta versión sale solo en `16.0`. La rama `17.0` se queda en
+> `2.5.0` a propósito hasta que se porte, así que por primera vez los tres
+> últimos números no coinciden entre series.
+
 ## 16.0.2.5.0 / 17.0.2.5.0 — una venta suspendida se retoma con la misma referencia
 
 El cajero validaba una referencia, la venta se suspendía o salía del POS sin

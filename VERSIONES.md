@@ -6,7 +6,7 @@ un único paquete que soporte varias.
 
 | Rama | Odoo | Versión del manifest | Imagen de pruebas |
 | :--- | :--- | :--- | :--- |
-| `16.0` | 16.0 | `16.0.2.5.0` | `odoo:16.0` |
+| `16.0` | 16.0 | `16.0.2.6.0` | `odoo:16.0` |
 | `17.0` | 17.0 | `17.0.2.5.0` | `odoo:17.0` |
 
 No hay rama `main`: el código es específico de la serie, así que una rama común

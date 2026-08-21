@@ -64,6 +64,8 @@ La URL base del backend vive en el parámetro de sistema `pabilo.api_url`
   el monto se convierte con las tasas nativas de Odoo antes de consultar. Sin tasa
   cargada el cajero ve un error claro, en vez de un "monto no coincide"
   incomprensible.
+- **Cobro parcial en otra moneda.** El monto que el cajero confirma fija la línea
+  de pago, así que abonar una parte deja saldo pendiente en vez de cerrar la venta.
 - **El cajero elige cómo se valida**: aceptar la tasa de Odoo, usar otra tasa o
   escribir el monto exacto del comprobante, con la fecha de la tasa a la vista
   cuando no es de hoy.

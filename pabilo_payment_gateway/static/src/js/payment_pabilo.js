@@ -59,6 +59,34 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
             return (order && order.uid) || null;
         },
 
+        /**
+         * Pone en la línea de pago el equivalente, en moneda del POS, del monto
+         * que se va a verificar en el banco.
+         *
+         * El servidor manda `pos_amount` ya convertido y redondeado con la
+         * precisión de la moneda del POS, y lo deja en 0 cuando no hay nada que
+         * traducir (misma moneda, o sin tasa con la que dividir).
+         */
+        _apply_line_amount: function (line, preview) {
+            if (!preview || !preview.converted || !preview.pos_amount) {
+                return false;
+            }
+            const nuevo = preview.pos_amount;
+            if (Math.abs((line.amount || 0) - nuevo) < 0.005) {
+                return false;
+            }
+            const anterior = line.amount;
+            line.set_amount(nuevo);
+            console.info(
+                '[pabilo] línea de pago ajustada de %s a %s: es el equivalente de ' +
+                    'los %s que se van a verificar en el banco.',
+                anterior,
+                nuevo,
+                preview.label
+            );
+            return true;
+        },
+
         _verify: function (reference, amount, bankId, fechaPago, rate, amountInBank) {
             // El timeout del RPC debe superar el del servidor (110 s) para que
             // gane el mensaje real de Pabilo y no un error de red genérico.
@@ -318,6 +346,24 @@ odoo.define('pabilo_payment_gateway.payment', function (require) {
                 rate = eleccion.rate;
                 amountInBank = eleccion.amountInBank;
             }
+
+            // El monto que el cajero confirmó manda sobre la línea de pago.
+            //
+            // Sin esto el cobro parcial es imposible cuando el banco cobra en otra
+            // moneda. El teclado del POS recorta lo que se escribe al saldo
+            // pendiente **en la moneda del POS** (Odoo pone
+            // `maxValue = get_due()` cuando la caja no tiene método de efectivo,
+            // y NumberBuffer recorta en silencio), mientras que el cajero teclea
+            // bolívares. Cualquier cifra en bolívares supera ese tope, se recorta
+            // al total exacto, y la venta se cierra como pagada completa aunque el
+            // cliente haya abonado una parte.
+            //
+            // Diciéndole nosotros el monto, el teclado deja de estorbar: el cajero
+            // dice cuánto llegó al banco y la línea queda en su equivalente.
+            //
+            // Solo cuando hubo conversión: si la moneda del POS ya es la del banco
+            // no hay nada que traducir y no se toca nada.
+            this._apply_line_amount(line, preview);
 
             const amountLabel = (preview && preview.label) || line.get_amount_str();
 
