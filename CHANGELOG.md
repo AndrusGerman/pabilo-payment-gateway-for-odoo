@@ -4,6 +4,41 @@ Formato: `<serie>.<mayor>.<menor>.<parche>`, como exige el manifest de Odoo. Los
 tres últimos números van **iguales en las dos ramas**, así que `2.0.0` significa
 lo mismo en `16.0` y en `17.0`.
 
+## 16.0.2.5.0 / 17.0.2.5.0 — una venta suspendida se retoma con la misma referencia
+
+El cajero validaba una referencia, la venta se suspendía o salía del POS sin
+facturar, y al retomarla esa referencia **ya no servía**: Pabilo respondía que el
+movimiento fue consumido y el POS lo rechazaba. Y Pabilo tenía razón —lo
+consumimos nosotros un minuto antes—, pero sin memoria propia no había forma de
+distinguir «esto ya lo cobró otra venta» de «esto lo verifiqué yo y la venta no
+se cerró». El cliente se quedaba sin poder cobrar un pago que sí había recibido.
+
+- **Modelo nuevo `pabilo.verification`**: bitácora de cada verificación que hace
+  este Odoo, con la referencia, el movimiento de Pabilo, el monto, la cuenta y el
+  pedido del POS. Se consulta **antes** de llamar a la API.
+- **Retomar una venta ya no falla.** Si la verificación es nuestra y ninguna venta
+  la cobró, se acepta. Cuando se resuelve por la bitácora no hace falta ni
+  consultar al banco, o sea que tampoco se espera.
+- **Se reconoce la referencia aunque el cajero teclee otra cantidad de dígitos.**
+  Pabilo matchea por sufijo, así que la misma referencia puede llegar como
+  `704777` y luego como `4777`; compararlas con `=` las tomaría por distintas.
+- **Y si el sufijo no alcanza, manda el id del movimiento.** Pabilo devuelve el
+  mismo `user_bank_payment.id` tanto si el pago es nuevo como si ya se usó, así
+  que cuando responde `is_new: false` se busca ese id en la bitácora: si es
+  nuestro y está sin cobrar, se acepta.
+- **Cuando sí hay que rechazar, el mensaje dice en qué venta se cobró**, en vez
+  del «ya fue verificada antes» a secas. Si el pedido aún no tiene número de
+  secuencia se usa su referencia del POS: nunca se le dice al cajero «cobrada en
+  la venta /».
+- **La venta cerrada cierra la puerta.** Al crear el `pos.payment`, la
+  verificación pasa a `consumed` con su venta y no se vuelve a reutilizar.
+- **Menú «Verificaciones Pabilo»** con filtros por estado. Es la pantalla que
+  contesta «¿por qué me dice que esta referencia ya se usó?».
+
+Lo que evita cobrar dos veces: reutilizar exige **misma cuenta, referencia
+compatible, mismo monto, menos de 24 h y ninguna venta cerrada**. Un movimiento
+que consumió otro sistema no está en la bitácora y se sigue rechazando.
+
 ## 16.0.2.4.2 / 17.0.2.4.2 — un método borrado ya no deja la caja sin abrir
 
 - **Guarda al restaurar los pedidos guardados.** El POS conserva los pedidos sin

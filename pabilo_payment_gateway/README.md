@@ -34,6 +34,7 @@ indica otro servidor.
 | `models/pos_payment_method.py` | Métodos RPC que llama el POS: `pabilo_verify_payment`, `pabilo_amount_preview` y la resolución del monto en la moneda del banco. |
 | `static/src/js/payment_pabilo.js` | `PaymentInterface` del POS: teclado numérico, fecha del pago y selección de cuenta. |
 | `static/src/js/models.js` | `register_payment_method('pabilo', …)` y serialización de los campos en la línea de pago. |
+| `models/pabilo_verification.py` | Bitácora de lo que este Odoo verificó, para que una venta suspendida se pueda retomar. |
 | `models/pabilo_user_bank.py` | Espejo **de solo lectura** de las cuentas de Pabilo, y la creación de un método de pago y un diario por cada una. |
 
 El navegador nunca ve el appKey: el JS llama a Odoo por RPC y es el servidor
@@ -94,6 +95,48 @@ cada cuenta de Pabilo. No hay que escribirlo.
 Requisito de despliegue: el `dbfilter` de Odoo debe resolver a **una sola base**.
 Si coincide con varias, Odoo no sabe cuál usar en una ruta pública y responde 404
 en lugar de procesar el webhook.
+
+## Referencias y ventas suspendidas
+
+Pabilo marca cada movimiento bancario como consumido en cuanto se verifica. Eso es
+lo que evita que dos ventas cobren el mismo pago — y también lo que rompía un caso
+muy normal en una caja: el cajero valida la referencia, algo interrumpe la venta y
+al retomarla la referencia ya no sirve, porque Pabilo responde que el movimiento
+fue consumido. Y es verdad: lo consumimos nosotros un minuto antes.
+
+Sin memoria propia no hay forma de distinguir «esto ya lo cobró otra venta» de
+«esto lo verifiqué yo y la venta no se cerró». Por eso el módulo lleva una
+bitácora, `pabilo.verification`, que se consulta **antes** de llamar a la API.
+
+### Cómo se reconoce una verificación propia
+
+Por dos caminos, y hacen falta los dos:
+
+1. **Referencia, cuenta y monto.** La comparación de la referencia es **por
+   sufijo**, no exacta, porque Pabilo matchea así: el cajero teclea los últimos
+   dígitos y la misma referencia puede llegar como `704777` una vez y como `4777`
+   la siguiente. Resuelve sin tocar la API.
+2. **El id del movimiento.** Si el sufijo no alcanza, se llama a Pabilo; cuando
+   responde `is_new: false` se busca su `user_bank_payment.id` en la bitácora.
+   Ese id es la clave fuerte: Pabilo devuelve el mismo tanto si el pago es nuevo
+   como si ya se usó, así que reconoce el caso sin depender de lo que teclee el
+   cajero.
+
+### Qué impide cobrar dos veces
+
+Reutilizar exige **todo** a la vez: misma cuenta, referencia compatible, mismo
+monto, menos de 24 h y **ninguna venta cerrada**. Al crear el `pos.payment` la
+verificación pasa a `consumed` con su venta, y desde ahí no se reutiliza nunca
+más: el próximo intento se rechaza diciendo **en qué venta se cobró**.
+
+Un movimiento que consumió otro sistema —otra instalación, la app de Pabilo— no
+está en la bitácora, y se sigue rechazando igual que antes.
+
+### Dónde se consulta
+
+**Pabilo → Verificaciones Pabilo.** Es donde se responde «¿por qué me dice que esta
+referencia ya se usó?»: si sale como *Cobrada en una venta*, la columna Venta dice
+en cuál. Es de solo lectura; la escribe el módulo.
 
 ## Un método de pago por cuenta
 

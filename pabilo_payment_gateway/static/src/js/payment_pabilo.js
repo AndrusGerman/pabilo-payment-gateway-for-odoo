@@ -55,6 +55,14 @@ export class PaymentPabilo extends PaymentInterface {
         return (this.pos.currency && this.pos.currency.id) || null;
     }
 
+    // Identificador que el POS le da al pedido en el navegador, antes de que
+    // exista en Odoo. Ata la verificacion a esta venta, para reconocerla si se
+    // suspende y se retoma.
+    get orderUid() {
+        const order = this.pos.get_order();
+        return (order && order.uid) || null;
+    }
+
     // Lo que teclea el cajero viene con el separador decimal de la base.
     _parseNumber(payload) {
         const numero = parseFloat(String(payload || "").replace(",", "."));
@@ -78,6 +86,7 @@ export class PaymentPabilo extends PaymentInterface {
                     this.posCurrencyId,
                     rate || null,
                     amountInBank === null || amountInBank === undefined ? null : amountInBank,
+                    this.orderUid,
                 ],
                 {},
                 { timeout: VERIFY_TIMEOUT_MS }
@@ -359,15 +368,26 @@ export class PaymentPabilo extends PaymentInterface {
 
         if (result.verified) {
             if (!result.is_new) {
-                // El movimiento ya fue consumido por una venta anterior:
-                // aceptarlo de nuevo cobraría dos veces el mismo pago.
+                // El movimiento ya fue consumido y no fue por una venta nuestra
+                // sin cerrar: aceptarlo cobraría dos veces el mismo pago. Lo de
+                // la venta suspendida ya lo resolvió el servidor contra su
+                // bitácora, antes de llegar aquí.
                 await this.popup.add(ErrorPopup, {
                     title: _t("Pago ya registrado"),
-                    body: _t(
-                        "Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo."
-                    ),
+                    body:
+                        result.message ||
+                        _t("Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo."),
                 });
                 return false;
+            }
+            if (result.reused) {
+                // Venta que se retomó: se aceptó desde la bitácora, sin volver a
+                // consultar a Pabilo.
+                console.info(
+                    "[pabilo] referencia %s aceptada desde la bitácora local: " +
+                        "ya la habíamos verificado y ninguna venta la cobró.",
+                    reference
+                );
             }
             line.pabilo_reference = reference;
             line.pabilo_payment_id = result.payment_id;

@@ -303,11 +303,21 @@ class PosPaymentMethod(models.Model):
 
     def pabilo_verify_payment(self, reference, amount, user_bank_id=None, source_name=None,
                               fecha_pago=None, pos_currency_id=None, alt_rate=None,
-                              amount_in_bank_currency=None):
+                              amount_in_bank_currency=None, pos_order_uid=None):
         """Verifica un pago contra la API de Pabilo. Llamado desde el POS.
+
+        Antes de llamar a la API se mira la bitácora propia
+        (`pabilo.verification`). Si este mismo Odoo ya verificó esta referencia y
+        la venta no llegó a cerrarse, se acepta sin consultar a Pabilo: es una
+        venta suspendida que se está retomando, y volver a preguntar sólo gastaría
+        otro crédito para que Pabilo respondiera, con razón, que el movimiento ya
+        se usó.
 
         user_bank_id: cuenta elegida por el cajero en el POS (opcional). Si no
         llega, se usa la cuenta configurada en el metodo de pago.
+
+        pos_order_uid: identificador que el POS le da al pedido en el navegador.
+        Es lo que ata la verificación a la venta en curso.
 
         pos_currency_id: moneda en la que viene `amount`, o sea la de la linea de
         pago del POS. La conversion a la moneda del banco se hace aqui y no en el
@@ -356,10 +366,69 @@ class PosPaymentMethod(models.Model):
                 return self._pabilo_error(
                     'INVALID_DATE', _('La fecha debe tener el formato AAAA-MM-DD.'))
 
+        Bitacora = self.env['pabilo.verification']
+        referencia = (reference or '').strip()
+
+        # 1) ¿Ya lo verificamos nosotros y la venta no se cerró? Se acepta sin
+        #    tocar la API: ni un crédito, ni la espera de hasta 110 s.
+        reutilizable = Bitacora._find_reusable(user_bank, referencia, res['amount'])
+        if reutilizable:
+            reutilizable._note_reuse(pos_order_uid)
+            return {
+                'verified': True,
+                'status': 'paid',
+                'payment_id': reutilizable.pabilo_payment_id,
+                'is_new': True,
+                'credit_cost': 0.0,
+                'error_code': '',
+                'message': '',
+                'reused': True,
+            }
+
+        # 2) ¿La cobró ya una venta cerrada? Se corta aquí y se dice cuál, que es
+        #    mucho más útil que un «ya fue verificada antes» a secas.
+        consumidas = Bitacora._find_any(user_bank, referencia).filtered(
+            lambda v: v.state == 'consumed')
+        if consumidas:
+            return self._pabilo_error(
+                'ALREADY_CONSUMED', consumidas[0]._consumed_message())
+
         _logger.info("Pabilo verify ref=%s monto=%s %s (origen del monto: %s)",
-                     reference, res['amount'], res['currency'].name, res['source'])
-        return self.env['pabilo.client'].verify_payment(
-            user_bank, reference, res['amount'], source_name=source[:120], fecha_pago=fecha)
+                     referencia, res['amount'], res['currency'].name, res['source'])
+        resultado = self.env['pabilo.client'].verify_payment(
+            user_bank, referencia, res['amount'], source_name=source[:120], fecha_pago=fecha)
+
+        # 3) Verificación nueva y buena: se anota, para que retomar la venta más
+        #    tarde no vuelva a chocar contra el `is_new` de Pabilo.
+        if resultado.get('verified') and resultado.get('is_new'):
+            Bitacora._log_verification(
+                user_bank, referencia, res['amount'], res['currency'], resultado,
+                pos_order_uid=pos_order_uid, payment_method=self, source_name=source[:120])
+            resultado['reused'] = False
+            return resultado
+
+        # 4) Pabilo dice que el movimiento ya se usó. La pregunta es si fuimos
+        #    nosotros. Aquí el identificador del movimiento manda sobre la
+        #    referencia: Pabilo devuelve el mismo `user_bank_payment.id` tanto si
+        #    el pago es nuevo como si ya se usó, así que reconoce el caso incluso
+        #    cuando el cajero teclea otra cantidad de dígitos.
+        if resultado.get('verified') and not resultado.get('is_new'):
+            propia = Bitacora._find_by_payment_id(resultado.get('payment_id'))
+            if propia and propia.state == 'consumed':
+                return self._pabilo_error('ALREADY_CONSUMED', propia._consumed_message())
+            if propia:
+                # Nuestra, verificada y sin venta cerrada: es la venta suspendida
+                # que se está retomando. Se acepta.
+                propia._note_reuse(pos_order_uid)
+                resultado = dict(resultado, is_new=True, reused=True, credit_cost=0.0,
+                                 error_code='', message='')
+                return resultado
+            # No la tenemos: el movimiento lo consumió algo que no es este Odoo.
+            # Se deja pasar tal cual y el POS lo rechaza, que es lo que evita
+            # cobrar dos veces el mismo pago.
+
+        resultado['reused'] = False
+        return resultado
 
     def pabilo_get_user_banks(self):
         """Cuentas Pabilo disponibles para elegir en el POS al cobrar."""
