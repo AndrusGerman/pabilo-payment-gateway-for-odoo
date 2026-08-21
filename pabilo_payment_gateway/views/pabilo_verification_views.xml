@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pabilo_verification_view_tree" model="ir.ui.view">
+        <field name="name">pabilo.verification.tree</field>
+        <field name="model">pabilo.verification</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false"
+                  decoration-muted="state == 'consumed'">
+                <field name="create_date" string="Verificado"/>
+                <field name="reference"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="user_bank_id"/>
+                <field name="payment_method_id"/>
+                <field name="state"/>
+                <field name="pos_order_id"/>
+                <field name="reused_count" string="Reutilizada"/>
+                <field name="source_name" optional="hide"/>
+                <field name="pabilo_payment_id" optional="hide"/>
+                <field name="pos_order_uid" optional="hide"/>
+                <field name="create_uid" string="Usuario" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="pabilo_verification_view_search" model="ir.ui.view">
+        <field name="name">pabilo.verification.search</field>
+        <field name="model">pabilo.verification</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="reference"/>
+                <field name="pabilo_payment_id"/>
+                <field name="pos_order_id"/>
+                <field name="user_bank_id"/>
+                <!-- «Sin cobrar» es la que importa para el caso de la venta
+                     suspendida: verificada y todavía sin venta cerrada. -->
+                <filter name="pendientes" string="Sin cobrar"
+                        domain="[('state', '=', 'verified')]"/>
+                <filter name="cobradas" string="Cobradas en una venta"
+                        domain="[('state', '=', 'consumed')]"/>
+                <separator/>
+                <filter name="hoy" string="Hoy"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="por_estado" string="Estado" context="{'group_by': 'state'}"/>
+                    <filter name="por_cuenta" string="Cuenta Pabilo" context="{'group_by': 'user_bank_id'}"/>
+                    <filter name="por_metodo" string="Método de Pago" context="{'group_by': 'payment_method_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="pabilo_verification_view_form" model="ir.ui.view">
+        <field name="name">pabilo.verification.form</field>
+        <field name="model">pabilo.verification</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Registro de una verificación hecha contra Pabilo. Se guarda para que
+                        una venta suspendida pueda retomarse con la misma referencia sin
+                        gastar otro crédito. Es de solo lectura: lo escribe el módulo.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="reference"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="user_bank_id"/>
+                            <field name="payment_method_id"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="pos_order_id"/>
+                            <field name="pos_session_id"/>
+                            <field name="reused_count"/>
+                            <field name="source_name"/>
+                            <field name="pabilo_payment_id"/>
+                            <field name="pos_order_uid"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pabilo_verification" model="ir.actions.act_window">
+        <field name="name">Verificaciones Pabilo</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pabilo.verification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="pabilo_verification_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Todavía no se ha verificado ningún pago</p>
+            <p>
+                Aquí queda cada pago que este Odoo verificó contra Pabilo, con la venta que
+                lo cobró. Es donde se responde la pregunta
+                <b>«¿por qué me dice que esta referencia ya se usó?»</b>: si aparece como
+                <b>Cobrada en una venta</b>, la columna Venta dice en cuál.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_pabilo_verification"
+              name="Verificaciones Pabilo"
+              parent="menu_pabilo_root"
+              sequence="8"
+              groups="point_of_sale.group_pos_manager"
+              action="action_pabilo_verification"/>
+</odoo>

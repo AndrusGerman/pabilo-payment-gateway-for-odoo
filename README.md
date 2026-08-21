@@ -68,7 +68,10 @@ La URL base del backend vive en el parámetro de sistema `pabilo.api_url`
   escribir el monto exacto del comprobante, con la fecha de la tasa a la vista
   cuando no es de hoy.
 - Fecha del pago prellenada con hoy, calculada en la zona local del navegador.
-- Rechazo de referencias ya usadas, para no cobrar dos veces el mismo pago.
+- Rechazo de referencias ya usadas, para no cobrar dos veces el mismo pago — pero
+  **una venta suspendida se retoma con la misma referencia**, porque el módulo
+  recuerda lo que verificó y sabe distinguir su propia verificación de un cobro
+  ajeno.
 - Referencia e ID de Pabilo persistidos en `pos.payment` y en el recibo.
 - Cuentas bancarias sincronizadas desde Pabilo en **modo solo lectura**, con tres
   capas de protección (ACL, guardas de contexto y vistas).
