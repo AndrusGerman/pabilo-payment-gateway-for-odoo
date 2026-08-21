@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0-20250909\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-20 18:33+0000\n"
-"PO-Revision-Date: 2026-08-20 18:33+0000\n"
+"POT-Creation-Date: 2026-08-21 09:53+0000\n"
+"PO-Revision-Date: 2026-08-21 09:53+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -108,9 +108,23 @@ msgid "Agregar Método de Pago Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Agrupar por"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_config_settings
 #: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_config_settings
 msgid "Ajustes Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_verification
+msgid ""
+"Aquí queda cada pago que este Odoo verificó contra Pabilo, con la venta que\n"
+"                lo cobró. Es donde se responde la pregunta\n"
+"                <b>«¿por qué me dice que esta referencia ya se usó?»</b>: si aparece como\n"
+"                <b>Cobrada en una venta</b>, la columna Venta dice en cuál."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -164,6 +178,11 @@ msgid "Binance Pay"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__source_name
+msgid "Caja y Cajero"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__canceled
 msgid "Cancelado"
 msgstr ""
@@ -179,6 +198,16 @@ msgid "Cliente HTTP de la API de Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Cobradas en una venta"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_verification__state__consumed
+msgid "Cobrado en una venta"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_provider__code
 msgid "Code"
 msgstr ""
@@ -191,6 +220,7 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__company_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__company_id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__company_id
 msgid "Compañía"
 msgstr ""
 
@@ -246,12 +276,14 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__create_uid
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__create_uid
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__create_date
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__create_date
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__create_date
 msgid "Created on"
 msgstr ""
 
@@ -281,9 +313,11 @@ msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_account_journal__pabilo_user_bank_id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__user_bank_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_user_bank_id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pos_payment_method__pabilo_user_bank_id
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_pos_payment_method_view_tree
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
 msgid "Cuenta Pabilo"
 msgstr ""
 
@@ -334,6 +368,13 @@ msgid "Cuentas Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__reused_count
+msgid ""
+"Cuántas veces se aceptó esta verificación sin volver a consultar a Pabilo, "
+"por retomarse una venta suspendida."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
 msgid "Datos del Pago"
 msgstr ""
@@ -369,6 +410,7 @@ msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__display_name
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -515,11 +557,35 @@ msgid "Esta cuenta requiere elegir tipo de movimiento."
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_verification.py:0
+#, python-format
+msgid ""
+"Esta referencia ya fue cobrada en la venta %s. Pida al cliente un pago "
+"nuevo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#. odoo-python
+#: code:addons/pabilo_payment_gateway/models/pabilo_verification.py:0
+#, python-format
+msgid ""
+"Esta referencia ya fue verificada antes y cobrada en una venta. Pida al "
+"cliente un pago nuevo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-javascript
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid ""
 "Esta referencia ya fue verificada antes. Pida al cliente un pago nuevo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__state
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Estado"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -599,8 +665,14 @@ msgid ""
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Hoy"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__id
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__id
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__id
 msgid "ID"
 msgstr ""
 
@@ -616,6 +688,11 @@ msgid "ID Pago Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__pabilo_payment_id
+msgid "ID del Movimiento en Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,help:pabilo_payment_gateway.field_pos_payment__pabilo_payment_id
 msgid "ID del user_bank_payment en Pabilo, para trazabilidad cruzada."
 msgstr ""
@@ -623,6 +700,20 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__pabilo_id
 msgid "ID en Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__pabilo_payment_id
+msgid ""
+"Identificador del movimiento bancario en Pabilo. Es la clave fuerte: dos "
+"referencias pueden coincidir en sus últimos dígitos, este id no."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__pos_order_uid
+msgid ""
+"Identificador que el POS da al pedido en el navegador, antes de que exista "
+"en Odoo. Es lo que permite reconocer una venta suspendida."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -727,6 +818,13 @@ msgid "La referencia existe pero el monto no coincide."
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__pos_order_id
+msgid ""
+"La venta que finalmente cobró este movimiento. Mientras esté vacío, el pago "
+"se verificó pero no llegó a ninguna venta cerrada."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_user_bank
 msgid ""
 "Las cuentas bancarias se administran en Pabilo y aquí solo se consultan.\n"
@@ -747,19 +845,28 @@ msgstr ""
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard____last_update
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank____last_update
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_uid
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_uid
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_payment_method_wizard__write_date
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__write_date
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__reference
+msgid ""
+"Lo que el cajero teclea: los últimos dígitos de la referencia bancaria."
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -780,6 +887,11 @@ msgid "Mercantil Empresa (Test)"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__currency_id
+msgid "Moneda"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_user_bank__currency_id
 msgid "Moneda de los Movimientos"
 msgstr ""
@@ -790,6 +902,11 @@ msgid ""
 "Moneda en la que el banco registra los movimientos de esta cuenta. Es contra"
 " esta moneda que Pabilo compara el monto al verificar un pago, sin importar "
 "en que moneda cobre el POS."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__amount
+msgid "Monto Verificado"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -804,6 +921,17 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid "Monto que llegó al banco"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__amount
+msgid "Monto que se buscó en el banco, en la moneda de la cuenta."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__payment_method_id
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Método de Pago"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1040,6 +1168,11 @@ msgid "Payment Transaction"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__pos_order_uid
+msgid "Pedido del POS"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_payment_link_status__pending
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_status__pending
 msgid "Pendiente"
@@ -1088,6 +1221,16 @@ msgid "Provincial Personal"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields,help:pabilo_payment_gateway.field_pabilo_verification__source_name
+msgid "Quién cobró, tal como se le informó a Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__reference
+msgid "Referencia"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields,field_description:pabilo_payment_gateway.field_payment_transaction__pabilo_reference
 msgid "Referencia Bancaria"
 msgstr ""
@@ -1112,8 +1255,21 @@ msgid "Referencia del pago"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_form
+msgid ""
+"Registro de una verificación hecha contra Pabilo. Se guarda para que\n"
+"                        una venta suspendida pueda retomarse con la misma referencia sin\n"
+"                        gastar otro crédito. Es de solo lectura: lo escribe el módulo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.view_payment_transaction_form_inherit_pabilo
 msgid "Resultado"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_tree
+msgid "Reutilizada"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1165,6 +1321,16 @@ msgstr ""
 #: code:addons/pabilo_payment_gateway/models/payment_transaction.py:0
 #, python-format
 msgid "Selecciona una Cuenta Pabilo."
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__pos_session_id
+msgid "Sesión POS"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_search
+msgid "Sin cobrar"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1265,6 +1431,16 @@ msgid "Todavía no hay métodos de pago Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.actions.act_window,help:pabilo_payment_gateway.action_pabilo_verification
+msgid "Todavía no se ha verificado ningún pago"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_tree
+msgid "Total"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_movement_type__transfer
 msgid "Transferencia Bancaria"
 msgstr ""
@@ -1304,10 +1480,36 @@ msgid "Usar otra tasa…"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_tree
+msgid "Usuario"
+msgstr ""
+
+#. module: pabilo_payment_gateway
 #. odoo-javascript
 #: code:addons/pabilo_payment_gateway/static/src/js/payment_pabilo.js:0
 #, python-format
 msgid "Valor no válido"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__reused_count
+msgid "Veces Reutilizada"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model.fields,field_description:pabilo_payment_gateway.field_pabilo_verification__pos_order_id
+msgid "Venta"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.actions.act_window,name:pabilo_payment_gateway.action_pabilo_verification
+#: model:ir.ui.menu,name:pabilo_payment_gateway.menu_pabilo_verification
+msgid "Verificaciones Pabilo"
+msgstr ""
+
+#. module: pabilo_payment_gateway
+#: model:ir.model,name:pabilo_payment_gateway.model_pabilo_verification
+msgid "Verificaciones de pago hechas contra Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
@@ -1316,7 +1518,9 @@ msgid "Verificación Pabilo"
 msgstr ""
 
 #. module: pabilo_payment_gateway
+#: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__pabilo_verification__state__verified
 #: model:ir.model.fields.selection,name:pabilo_payment_gateway.selection__payment_transaction__pabilo_status__verified
+#: model_terms:ir.ui.view,arch_db:pabilo_payment_gateway.pabilo_verification_view_tree
 msgid "Verificado"
 msgstr ""
 
